@@ -8,6 +8,14 @@ class EquationDragDrop extends StatefulWidget {
 }
 
 class _EquationDragDropState extends State<EquationDragDrop> {
+  bool _showResults = false;
+
+  void _checkAnswers() {
+    setState(() {
+      _showResults = true;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,12 +63,29 @@ class _EquationDragDropState extends State<EquationDragDrop> {
               const SizedBox(height: 40),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: const [
-                  DropTarget(label: 'Coefficient', expectedData: ['2']),
-                  DropTarget(label: 'Variable', expectedData: ['x']),
-                  DropTarget(label: 'Operator', expectedData: ['+', '=']),
-                  DropTarget(label: 'Constant', expectedData: ['3', '5']),
+                children: [
+                  DropTarget(
+                      label: 'Coefficient',
+                      expectedData: ['2'],
+                      showResults: _showResults),
+                  DropTarget(
+                      label: 'Variable',
+                      expectedData: ['x'],
+                      showResults: _showResults),
+                  DropTarget(
+                      label: 'Operator',
+                      expectedData: ['+', '='],
+                      showResults: _showResults),
+                  DropTarget(
+                      label: 'Constant',
+                      expectedData: ['3', '5'],
+                      showResults: _showResults),
                 ],
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _checkAnswers,
+                child: const Text('Check Answers'),
               ),
             ],
           ),
@@ -104,9 +129,14 @@ class DraggableItem extends StatelessWidget {
 class DropTarget extends StatefulWidget {
   final String label;
   final List<String> expectedData;
+  final bool showResults;
 
-  const DropTarget({Key? key, required this.label, required this.expectedData})
-      : super(key: key);
+  const DropTarget({
+    Key? key,
+    required this.label,
+    required this.expectedData,
+    required this.showResults,
+  }) : super(key: key);
 
   @override
   State<DropTarget> createState() => _DropTargetState();
@@ -114,14 +144,32 @@ class DropTarget extends StatefulWidget {
 
 class _DropTargetState extends State<DropTarget> {
   List<String> acceptedLabels = []; // List to store all accepted labels
+  bool hasIncorrectItem =
+      false; // Flag to track if any incorrect item has been dropped
 
   @override
   Widget build(BuildContext context) {
+    Color targetColor = Colors.grey[300]!;
+    if (widget.showResults) {
+      if (acceptedLabels.isEmpty) {
+        targetColor = Colors.grey[300]!;
+        hasIncorrectItem = false; // Reset the flag if no items are dropped
+      } else if (acceptedLabels
+          .any((label) => widget.expectedData.contains(label))) {
+        targetColor = Colors.green;
+        hasIncorrectItem = false; // Reset the flag if all items are correct
+      } else {
+        targetColor = Colors.red;
+        hasIncorrectItem =
+            true; // Set the flag if any incorrect item is dropped
+      }
+    }
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         DragTarget<String>(
-          onWillAccept: (data) => widget.expectedData.contains(data),
+          onWillAccept: (data) => true,
           onAccept: (receivedItem) {
             setState(() {
               acceptedLabels
@@ -133,8 +181,9 @@ class _DropTargetState extends State<DropTarget> {
               width: 150,
               height: 50,
               decoration: BoxDecoration(
-                color:
-                    acceptedLabels.isNotEmpty ? Colors.green : Colors.grey[300],
+                color: hasIncorrectItem
+                    ? Colors.red
+                    : targetColor, // Use red color if any incorrect item is dropped
                 border: Border.all(color: Colors.blue),
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -142,7 +191,9 @@ class _DropTargetState extends State<DropTarget> {
                 child: Text(
                   widget.label, // Display the drop target label
                   style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold),
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             );

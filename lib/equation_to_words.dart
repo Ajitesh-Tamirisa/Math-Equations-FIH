@@ -34,56 +34,64 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
       appBar: AppBar(
         title: const Text('Equation to Words Game'),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(20.0),
-            child: Text('2x + 4 = 8',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/images/Background.png"),
+            fit: BoxFit.cover,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(7, (index) {
-              return DropTarget(
-                index: index,
-                label: userAnswer[index],
-                onAccept: (receivedItem) {
-                  setState(() {
-                    userAnswer[index] = receivedItem;
-                  });
-                },
-              );
-            }),
-          ),
-          const SizedBox(height: 40),
-          Wrap(
-            alignment: WrapAlignment.spaceEvenly,
-            spacing: 20,
-            runSpacing: 20,
-            children: words.map((word) {
-              return DraggableItem(
-                label: word,
-                data: word,
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 40),
-          ElevatedButton(
-            onPressed: () {
-              if (userAnswer.join(' ') == answer.join(' ')) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Correct!')),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(20.0),
+              child: Text('2x + 4 = 8',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(7, (index) {
+                return DropTarget(
+                  index: index,
+                  label: userAnswer[index],
+                  onAccept: (receivedItem) {
+                    setState(() {
+                      userAnswer[index] = receivedItem;
+                    });
+                  },
                 );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Try again.')),
+              }),
+            ),
+            const SizedBox(height: 40),
+            Wrap(
+              alignment: WrapAlignment.spaceEvenly,
+              spacing: 20,
+              runSpacing: 20,
+              children: words.map((word) {
+                return DraggableItem(
+                  label: word,
+                  data: word,
                 );
-              }
-            },
-            child: const Text('Check Answer'),
-          ),
-        ],
+              }).toList(),
+            ),
+            const SizedBox(height: 40),
+            ElevatedButton(
+              onPressed: () {
+                if (userAnswer.join(' ') == answer.join(' ')) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Correct!')),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Try again.')),
+                  );
+                }
+              },
+              child: const Text('Check Answer'),
+            ),
+          ],
+        ),
       ),
     );
   }
