@@ -303,6 +303,7 @@ import 'learn_menu.dart';
 import 'equation_drag_drop.dart';
 import 'what_are_equations.dart';
 import 'parts_of_equations.dart';
+import 'equation_to_words.dart';
 
 void main() {
   runApp(const MyApp());
@@ -324,7 +325,7 @@ class MyApp extends StatelessWidget {
         '/learn': (context) => const LearnMenu(),
         '/play': (context) => const PlayMenu(),
         '/partsOfEquation': (context) => const EquationDragDrop(),
-        '/equationToWords': (context) => const EquationDragDrop(),
+        '/equationToWords': (context) => const EquationToWordsScreen(),
         '/whatAreEquations': (context) => const WhatAreEquations(),
         '/partsOfEquations': (context) => const PartsOfEquations(),
       },

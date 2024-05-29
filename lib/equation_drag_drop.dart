@@ -11,6 +11,15 @@ class _EquationDragDropState extends State<EquationDragDrop> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Equation Drag Drop'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
       body: Stack(
         children: [
           Container(
