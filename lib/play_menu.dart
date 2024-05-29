@@ -32,7 +32,7 @@ class PlayMenu extends StatelessWidget {
                 const Text(
                   'Play Games',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 40,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -41,6 +41,13 @@ class PlayMenu extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushNamed(context, '/partsOfEquation');
                   },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 32), // Set button padding
+                    textStyle:
+                        const TextStyle(fontSize: 24), // Set button text size
+                    elevation: 6, // Set button elevation (shadow)
+                  ),
                   child: const Text('Parts of an Equation'),
                 ),
                 const SizedBox(height: 20),
@@ -48,6 +55,13 @@ class PlayMenu extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushNamed(context, '/equationToWords');
                   },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 32), // Set button padding
+                    textStyle:
+                        const TextStyle(fontSize: 24), // Set button text size
+                    elevation: 6, // Set button elevation (shadow)
+                  ),
                   child: const Text('Equation to words'),
                 ),
               ],
