@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'linear_equations_introduction.dart';
 
 class LearnMenu extends StatelessWidget {
   const LearnMenu({Key? key}) : super(key: key);
@@ -61,7 +62,11 @@ class LearnMenu extends StatelessWidget {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-                    // TODO: Navigate to "Linear Equations" page
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => LinearEquationsContent()),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(

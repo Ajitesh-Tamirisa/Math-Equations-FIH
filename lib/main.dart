@@ -304,6 +304,9 @@ import 'equation_drag_drop.dart';
 import 'what_are_equations.dart';
 import 'parts_of_equations.dart';
 import 'equation_to_words.dart';
+import 'what_are_equations_detail.dart';
+import 'importance_of_equations.dart';
+import 'real_world_applications.dart';
 
 void main() {
   runApp(const MyApp());
@@ -328,6 +331,9 @@ class MyApp extends StatelessWidget {
         '/equationToWords': (context) => const EquationToWordsScreen(),
         '/whatAreEquations': (context) => const WhatAreEquations(),
         '/partsOfEquations': (context) => const PartsOfEquations(),
+        '/whatAreEquationsDetail': (context) => const WhatAreEquationsDetail(),
+        '/importanceOfEquations': (context) => const ImportanceOfEquations(),
+        '/realWorldApplications': (context) => const RealWorldApplications(),
       },
     );
   }
