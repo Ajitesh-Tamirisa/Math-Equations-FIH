@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'instructions_widget.dart';
 
 class EquationDragDrop extends StatefulWidget {
   const EquationDragDrop({Key? key}) : super(key: key);
@@ -21,6 +22,13 @@ class _EquationDragDropState extends State<EquationDragDrop> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Equation Drag Drop'),
+        actions: [
+          InstructionsWidget(
+            instructions: 'Welcome to Parts of Equations!\n\n'
+                'Learn and play with equations.\n\n'
+                'Drag the part of the equation to the correct answer. Once you finish dragging all the parts into the correct boxes, click "Check Answers" button.\n',
+          )
+        ],
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
