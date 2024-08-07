@@ -10,6 +10,239 @@ class EquationDragDrop extends StatefulWidget {
 
 class _EquationDragDropState extends State<EquationDragDrop> {
   bool _showResults = false;
+  int _currentQuestionIndex = 0;
+
+  final List<Map<String, dynamic>> _questions = [
+    {
+      'equation': '2x + 3 = 5',
+      'draggables': ['2', 'x', '+', '3', '=', '5'],
+      'targets': {
+        'Coefficient': ['2'],
+        'Variable': ['x'],
+        'Operator': ['+', '='],
+        'Constant': ['3', '5']
+      }
+    },
+    {
+      'equation': '3y - 7 = 11',
+      'draggables': ['3', 'y', '-', '7', '=', '11'],
+      'targets': {
+        'Coefficient': ['3'],
+        'Variable': ['y'],
+        'Operator': ['-', '='],
+        'Constant': ['7', '11']
+      }
+    },
+    {
+      'equation': '4a + 6 = 10',
+      'draggables': ['4', 'a', '+', '6', '=', '10'],
+      'targets': {
+        'Coefficient': ['4'],
+        'Variable': ['a'],
+        'Operator': ['+', '='],
+        'Constant': ['6', '10']
+      }
+    },
+    {
+      'equation': '5b - 8 = 2',
+      'draggables': ['5', 'b', '-', '8', '=', '2'],
+      'targets': {
+        'Coefficient': ['5'],
+        'Variable': ['b'],
+        'Operator': ['-', '='],
+        'Constant': ['8', '2']
+      }
+    },
+    {
+      'equation': '6c + 9 = 15',
+      'draggables': ['6', 'c', '+', '9', '=', '15'],
+      'targets': {
+        'Coefficient': ['6'],
+        'Variable': ['c'],
+        'Operator': ['+', '='],
+        'Constant': ['9', '15']
+      }
+    },
+    {
+      'equation': '7d - 4 = 3',
+      'draggables': ['7', 'd', '-', '4', '=', '3'],
+      'targets': {
+        'Coefficient': ['7'],
+        'Variable': ['d'],
+        'Operator': ['-', '='],
+        'Constant': ['4', '3']
+      }
+    },
+    {
+      'equation': '8e + 12 = 20',
+      'draggables': ['8', 'e', '+', '12', '=', '20'],
+      'targets': {
+        'Coefficient': ['8'],
+        'Variable': ['e'],
+        'Operator': ['+', '='],
+        'Constant': ['12', '20']
+      }
+    },
+    {
+      'equation': '9f - 5 = 4',
+      'draggables': ['9', 'f', '-', '5', '=', '4'],
+      'targets': {
+        'Coefficient': ['9'],
+        'Variable': ['f'],
+        'Operator': ['-', '='],
+        'Constant': ['5', '4']
+      }
+    },
+    {
+      'equation': '10g + 14 = 24',
+      'draggables': ['10', 'g', '+', '14', '=', '24'],
+      'targets': {
+        'Coefficient': ['10'],
+        'Variable': ['g'],
+        'Operator': ['+', '='],
+        'Constant': ['14', '24']
+      }
+    },
+    {
+      'equation': '11h - 9 = 2',
+      'draggables': ['11', 'h', '-', '9', '=', '2'],
+      'targets': {
+        'Coefficient': ['11'],
+        'Variable': ['h'],
+        'Operator': ['-', '='],
+        'Constant': ['9', '2']
+      }
+    },
+    {
+      'equation': '12i + 8 = 20',
+      'draggables': ['12', 'i', '+', '8', '=', '20'],
+      'targets': {
+        'Coefficient': ['12'],
+        'Variable': ['i'],
+        'Operator': ['+', '='],
+        'Constant': ['8', '20']
+      }
+    },
+    {
+      'equation': '13j - 10 = 3',
+      'draggables': ['13', 'j', '-', '10', '=', '3'],
+      'targets': {
+        'Coefficient': ['13'],
+        'Variable': ['j'],
+        'Operator': ['-', '='],
+        'Constant': ['10', '3']
+      }
+    },
+    {
+      'equation': '14k + 18 = 32',
+      'draggables': ['14', 'k', '+', '18', '=', '32'],
+      'targets': {
+        'Coefficient': ['14'],
+        'Variable': ['k'],
+        'Operator': ['+', '='],
+        'Constant': ['18', '32']
+      }
+    },
+    {
+      'equation': '15l - 6 = 9',
+      'draggables': ['15', 'l', '-', '6', '=', '9'],
+      'targets': {
+        'Coefficient': ['15'],
+        'Variable': ['l'],
+        'Operator': ['-', '='],
+        'Constant': ['6', '9']
+      }
+    },
+    {
+      'equation': '16m + 5 = 21',
+      'draggables': ['16', 'm', '+', '5', '=', '21'],
+      'targets': {
+        'Coefficient': ['16'],
+        'Variable': ['m'],
+        'Operator': ['+', '='],
+        'Constant': ['5', '21']
+      }
+    },
+    {
+      'equation': '17n - 3 = 14',
+      'draggables': ['17', 'n', '-', '3', '=', '14'],
+      'targets': {
+        'Coefficient': ['17'],
+        'Variable': ['n'],
+        'Operator': ['-', '='],
+        'Constant': ['3', '14']
+      }
+    },
+    {
+      'equation': '18o + 6 = 24',
+      'draggables': ['18', 'o', '+', '6', '=', '24'],
+      'targets': {
+        'Coefficient': ['18'],
+        'Variable': ['o'],
+        'Operator': ['+', '='],
+        'Constant': ['6', '24']
+      }
+    },
+    {
+      'equation': '19p - 8 = 11',
+      'draggables': ['19', 'p', '-', '8', '=', '11'],
+      'targets': {
+        'Coefficient': ['19'],
+        'Variable': ['p'],
+        'Operator': ['-', '='],
+        'Constant': ['8', '11']
+      }
+    },
+    {
+      'equation': '20q + 10 = 30',
+      'draggables': ['20', 'q', '+', '10', '=', '30'],
+      'targets': {
+        'Coefficient': ['20'],
+        'Variable': ['q'],
+        'Operator': ['+', '='],
+        'Constant': ['10', '30']
+      }
+    },
+    {
+      'equation': '21r - 7 = 14',
+      'draggables': ['21', 'r', '-', '7', '=', '14'],
+      'targets': {
+        'Coefficient': ['21'],
+        'Variable': ['r'],
+        'Operator': ['-', '='],
+        'Constant': ['7', '14']
+      }
+    },
+    {
+      'equation': '22s + 12 = 34',
+      'draggables': ['22', 's', '+', '12', '=', '34'],
+      'targets': {
+        'Coefficient': ['22'],
+        'Variable': ['s'],
+        'Operator': ['+', '='],
+        'Constant': ['12', '34']
+      }
+    },
+  ];
+
+  late List<Map<String, dynamic>> _shuffledQuestions;
+
+  // List to keep track of accepted labels for each DropTarget
+  List<List<String>> _acceptedLabels = List.generate(
+    4,
+    (index) => [],
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    _shuffledQuestions = List.from(_questions);
+    _shuffleQuestions();
+  }
+
+  void _shuffleQuestions() {
+    _shuffledQuestions.shuffle(); // Shuffle questions
+  }
 
   void _checkAnswers() {
     setState(() {
@@ -17,8 +250,37 @@ class _EquationDragDropState extends State<EquationDragDrop> {
     });
   }
 
+  void _nextQuestion() {
+    setState(() {
+      _showResults = false;
+      _currentQuestionIndex =
+          (_currentQuestionIndex + 1) % _shuffledQuestions.length;
+      _resetDropTargets(); // Reset targets when moving to the next question
+    });
+  }
+
+  void _resetDropTargets() {
+    setState(() {
+      // Clear the accepted labels for all DropTargets
+      _acceptedLabels = List.generate(
+        4,
+        (index) => [],
+      );
+
+      // Reset the incorrect item flag for all DropTargets
+      for (var i = 0; i < _acceptedLabels.length; i++) {
+        _acceptedLabels[i] = [];
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    var currentQuestion = _shuffledQuestions[_currentQuestionIndex];
+    var equation = currentQuestion['equation'];
+    var draggables = currentQuestion['draggables'] as List<String>;
+    var targets = currentQuestion['targets'] as Map<String, List<String>>;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Equation Drag Drop'),
@@ -49,24 +311,19 @@ class _EquationDragDropState extends State<EquationDragDrop> {
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              const Padding(
-                padding: EdgeInsets.all(20.0),
-                child: Text('2x + 3 = 5',
-                    style:
-                        TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Text(equation,
+                    style: const TextStyle(
+                        fontSize: 24, fontWeight: FontWeight.bold)),
               ),
               Wrap(
                 alignment: WrapAlignment.spaceEvenly,
                 spacing: 20,
                 runSpacing: 20,
-                children: const [
-                  DraggableItem(label: '2', data: '2'),
-                  DraggableItem(label: 'x', data: 'x'),
-                  DraggableItem(label: '+', data: '+'),
-                  DraggableItem(label: '3', data: '3'),
-                  DraggableItem(label: '=', data: '='),
-                  DraggableItem(label: '5', data: '5'),
-                ],
+                children: draggables
+                    .map((label) => DraggableItem(label: label, data: label))
+                    .toList(),
               ),
               const SizedBox(height: 40),
               Row(
@@ -74,26 +331,59 @@ class _EquationDragDropState extends State<EquationDragDrop> {
                 children: [
                   DropTarget(
                       label: 'Coefficient',
-                      expectedData: ['2'],
-                      showResults: _showResults),
+                      expectedData: targets['Coefficient']!,
+                      showResults: _showResults,
+                      acceptedLabels: _acceptedLabels[0],
+                      onAcceptedLabelsChanged: (labels) {
+                        setState(() {
+                          _acceptedLabels[0] = labels;
+                        });
+                      }),
                   DropTarget(
                       label: 'Variable',
-                      expectedData: ['x'],
-                      showResults: _showResults),
+                      expectedData: targets['Variable']!,
+                      showResults: _showResults,
+                      acceptedLabels: _acceptedLabels[1],
+                      onAcceptedLabelsChanged: (labels) {
+                        setState(() {
+                          _acceptedLabels[1] = labels;
+                        });
+                      }),
                   DropTarget(
                       label: 'Operator',
-                      expectedData: ['+', '='],
-                      showResults: _showResults),
+                      expectedData: targets['Operator']!,
+                      showResults: _showResults,
+                      acceptedLabels: _acceptedLabels[2],
+                      onAcceptedLabelsChanged: (labels) {
+                        setState(() {
+                          _acceptedLabels[2] = labels;
+                        });
+                      }),
                   DropTarget(
                       label: 'Constant',
-                      expectedData: ['3', '5'],
-                      showResults: _showResults),
+                      expectedData: targets['Constant']!,
+                      showResults: _showResults,
+                      acceptedLabels: _acceptedLabels[3],
+                      onAcceptedLabelsChanged: (labels) {
+                        setState(() {
+                          _acceptedLabels[3] = labels;
+                        });
+                      }),
                 ],
               ),
               const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _checkAnswers,
-                child: const Text('Check Answers'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: _checkAnswers,
+                    child: const Text('Check Answers'),
+                  ),
+                  ElevatedButton(
+                    onPressed: _nextQuestion,
+                    child: const Text('Next Question'),
+                  ),
+                ],
               ),
             ],
           ),
@@ -138,12 +428,16 @@ class DropTarget extends StatefulWidget {
   final String label;
   final List<String> expectedData;
   final bool showResults;
+  final List<String> acceptedLabels;
+  final ValueChanged<List<String>> onAcceptedLabelsChanged;
 
   const DropTarget({
     Key? key,
     required this.label,
     required this.expectedData,
     required this.showResults,
+    required this.acceptedLabels,
+    required this.onAcceptedLabelsChanged,
   }) : super(key: key);
 
   @override
@@ -151,18 +445,16 @@ class DropTarget extends StatefulWidget {
 }
 
 class _DropTargetState extends State<DropTarget> {
-  List<String> acceptedLabels = []; // List to store all accepted labels
-  bool hasIncorrectItem =
-      false; // Flag to track if any incorrect item has been dropped
+  bool hasIncorrectItem = false;
 
   @override
   Widget build(BuildContext context) {
     Color targetColor = Colors.grey[300]!;
     if (widget.showResults) {
-      if (acceptedLabels.isEmpty) {
+      if (widget.acceptedLabels.isEmpty) {
         targetColor = Colors.grey[300]!;
         hasIncorrectItem = false; // Reset the flag if no items are dropped
-      } else if (acceptedLabels
+      } else if (widget.acceptedLabels
           .any((label) => widget.expectedData.contains(label))) {
         targetColor = Colors.green;
         hasIncorrectItem = false; // Reset the flag if all items are correct
@@ -180,8 +472,10 @@ class _DropTargetState extends State<DropTarget> {
           onWillAccept: (data) => true,
           onAccept: (receivedItem) {
             setState(() {
-              acceptedLabels
+              widget.acceptedLabels
                   .add(receivedItem); // Add the received item to the list
+              widget.onAcceptedLabelsChanged(
+                  widget.acceptedLabels); // Notify parent of changes
             });
           },
           builder: (context, candidateData, rejectedData) {
@@ -210,7 +504,7 @@ class _DropTargetState extends State<DropTarget> {
         Padding(
           padding: const EdgeInsets.only(top: 8.0),
           child: Text(
-            acceptedLabels
+            widget.acceptedLabels
                 .join(', '), // Display all accepted labels separated by commas
             style: const TextStyle(fontSize: 18, color: Colors.black),
           ),
