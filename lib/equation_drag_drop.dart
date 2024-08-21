@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'instructions_widget.dart';
 import 'score_manager.dart';
@@ -425,7 +427,7 @@ class DraggableItem extends StatelessWidget {
   }
 }
 
-class DropTarget extends StatefulWidget {
+/*class DropTarget extends StatefulWidget {
   final String label;
   final List<String> expectedData;
   final bool showResults;
@@ -513,24 +515,159 @@ class _DropTargetState extends State<DropTarget> {
       ],
     );
   }
+}*/
+
+class DropTarget extends StatefulWidget {
+  final String label;
+  final List<String> expectedData;
+  final bool showResults;
+  final List<String> acceptedLabels;
+  final ValueChanged<List<String>> onAcceptedLabelsChanged;
+  final VoidCallback onCorrectAnswer; // Add this callback
+
+  const DropTarget({
+    Key? key,
+    required this.label,
+    required this.expectedData,
+    required this.showResults,
+    required this.acceptedLabels,
+    required this.onAcceptedLabelsChanged,
+    required this.onCorrectAnswer, // Add this parameter
+  }) : super(key: key);
+
+  @override
+  State<DropTarget> createState() => _DropTargetState();
 }
+
+class _DropTargetState extends State<DropTarget> {
+  bool hasIncorrectItem = false;
+
+  @override
+  Widget build(BuildContext context) {
+    Color targetColor = Colors.grey[300]!;
+    if (widget.showResults) {
+      if (widget.acceptedLabels.isEmpty) {
+        targetColor = Colors.grey[300]!;
+        hasIncorrectItem = false; // Reset the flag if no items are dropped
+      } else if (widget.acceptedLabels
+          .any((label) => widget.expectedData.contains(label))) {
+        targetColor = Colors.green;
+        hasIncorrectItem = false; // Reset the flag if all items are correct
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          widget.onCorrectAnswer(); // Call the callback when correct
+        });
+      } else {
+        targetColor = Colors.red;
+        hasIncorrectItem =
+            true; // Set the flag if any incorrect item is dropped
+      }
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        DragTarget<String>(
+          onWillAccept: (data) => true,
+          onAccept: (receivedItem) {
+            setState(() {
+              widget.acceptedLabels
+                  .add(receivedItem); // Add the received item to the list
+              widget.onAcceptedLabelsChanged(
+                  widget.acceptedLabels); // Notify parent of changes
+            });
+          },
+          builder: (context, candidateData, rejectedData) {
+            return Container(
+              width: 150,
+              height: 50,
+              decoration: BoxDecoration(
+                color: hasIncorrectItem
+                    ? Colors.red
+                    : targetColor, // Use red color if any incorrect item is dropped
+                border: Border.all(color: Colors.blue),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Center(
+                child: Text(
+                  widget.label, // Display the drop target label
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 8.0),
+          child: Text(
+            widget.acceptedLabels
+                .join(', '), // Display all accepted labels separated by commas
+            style: const TextStyle(fontSize: 18, color: Colors.black),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// import 'package:confetti/confetti.dart';
+// import 'package:flutter/material.dart';
+// import 'instructions_widget.dart';
+// import 'score_manager.dart';
+
+// class EquationDragDrop extends StatefulWidget {
+//   const EquationDragDrop({Key? key}) : super(key: key);
+
+//   @override
+//   State<EquationDragDrop> createState() => _EquationDragDropState();
+// }
 
 class _EquationDragDropState extends State<EquationDragDrop> {
   bool _showResults = false;
   int _currentQuestionIndex = 0;
-
-  final ScoreManager _scoreManager =
-      ScoreManager(); // Add ScoreManager instance
+  final ScoreManager _scoreManager = ScoreManager();
+  final ConfettiController _confettiController =
+      ConfettiController(duration: const Duration(seconds: 1));
+  bool _scoreUpdated = false; // Flag to ensure score increments only once
 
   final List<Map<String, dynamic>> _questions = [
     // Your questions here
+    {
+      'equation': '2x + 3 = 5',
+      'draggables': ['2', 'x', '+', '3', '=', '5'],
+      'targets': {
+        'Coefficient': ['2'],
+        'Variable': ['x'],
+        'Operator': ['+', '='],
+        'Constant': ['3', '5']
+      }
+    },
+    {
+      'equation': '3y - 7 = 11',
+      'draggables': ['3', 'y', '-', '7', '=', '11'],
+      'targets': {
+        'Coefficient': ['3'],
+        'Variable': ['y'],
+        'Operator': ['-', '='],
+        'Constant': ['7', '11']
+      }
+    },
+    {
+      'equation': '4a + 6 = 10',
+      'draggables': ['4', 'a', '+', '6', '=', '10'],
+      'targets': {
+        'Coefficient': ['4'],
+        'Variable': ['a'],
+        'Operator': ['+', '='],
+        'Constant': ['6', '10']
+      }
+    },
   ];
 
   late List<Map<String, dynamic>> _shuffledQuestions;
-  List<List<String>> _acceptedLabels = List.generate(
-    4,
-    (index) => [],
-  );
+  List<List<String>> _acceptedLabels = List.generate(4, (index) => []);
 
   @override
   void initState() {
@@ -544,6 +681,8 @@ class _EquationDragDropState extends State<EquationDragDrop> {
   }
 
   void _checkAnswers() {
+    if (_scoreUpdated) return; // Prevent score from updating more than once
+
     bool allCorrect = true;
     for (int i = 0; i < _acceptedLabels.length; i++) {
       if (!_acceptedLabels[i].every((label) =>
@@ -559,6 +698,13 @@ class _EquationDragDropState extends State<EquationDragDrop> {
     if (allCorrect) {
       _scoreManager.incrementScore(
           1); // Increment the score by 1 if all answers are correct
+      _scoreUpdated = true; // Set flag to true to prevent further score updates
+      _confettiController.play(); // Play confetti animation
+
+      // Stop confetti animation after a few seconds
+      Timer(const Duration(seconds: 2), () {
+        _confettiController.stop();
+      });
     }
 
     setState(() {
@@ -572,6 +718,7 @@ class _EquationDragDropState extends State<EquationDragDrop> {
       _currentQuestionIndex =
           (_currentQuestionIndex + 1) % _shuffledQuestions.length;
       _resetDropTargets();
+      _scoreUpdated = false; // Reset flag for the new question
     });
   }
 
@@ -599,13 +746,7 @@ class _EquationDragDropState extends State<EquationDragDrop> {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Center(
-              child: Text(
-                'Score: ${_scoreManager.score}', // Display the current score
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ),
+            child: ScoreDisplay(score: _scoreManager.score),
           ),
         ],
         leading: IconButton(
@@ -647,64 +788,113 @@ class _EquationDragDropState extends State<EquationDragDrop> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   DropTarget(
-                      label: 'Coefficient',
-                      expectedData: targets['Coefficient']!,
-                      showResults: _showResults,
-                      acceptedLabels: _acceptedLabels[0],
-                      onAcceptedLabelsChanged: (labels) {
-                        setState(() {
-                          _acceptedLabels[0] = labels;
-                        });
-                      }),
+                    label: 'Coefficient',
+                    expectedData: targets['Coefficient']!,
+                    showResults: _showResults,
+                    acceptedLabels: _acceptedLabels[0],
+                    onAcceptedLabelsChanged: (labels) {
+                      setState(() {
+                        _acceptedLabels[0] = labels;
+                      });
+                    },
+                    onCorrectAnswer: _checkAnswers, // Pass the callback
+                  ),
                   DropTarget(
-                      label: 'Variable',
-                      expectedData: targets['Variable']!,
-                      showResults: _showResults,
-                      acceptedLabels: _acceptedLabels[1],
-                      onAcceptedLabelsChanged: (labels) {
-                        setState(() {
-                          _acceptedLabels[1] = labels;
-                        });
-                      }),
+                    label: 'Variable',
+                    expectedData: targets['Variable']!,
+                    showResults: _showResults,
+                    acceptedLabels: _acceptedLabels[1],
+                    onAcceptedLabelsChanged: (labels) {
+                      setState(() {
+                        _acceptedLabels[1] = labels;
+                      });
+                    },
+                    onCorrectAnswer: _checkAnswers, // Pass the callback
+                  ),
                   DropTarget(
-                      label: 'Operator',
-                      expectedData: targets['Operator']!,
-                      showResults: _showResults,
-                      acceptedLabels: _acceptedLabels[2],
-                      onAcceptedLabelsChanged: (labels) {
-                        setState(() {
-                          _acceptedLabels[2] = labels;
-                        });
-                      }),
+                    label: 'Operator',
+                    expectedData: targets['Operator']!,
+                    showResults: _showResults,
+                    acceptedLabels: _acceptedLabels[2],
+                    onAcceptedLabelsChanged: (labels) {
+                      setState(() {
+                        _acceptedLabels[2] = labels;
+                      });
+                    },
+                    onCorrectAnswer: _checkAnswers, // Pass the callback
+                  ),
                   DropTarget(
-                      label: 'Constant',
-                      expectedData: targets['Constant']!,
-                      showResults: _showResults,
-                      acceptedLabels: _acceptedLabels[3],
-                      onAcceptedLabelsChanged: (labels) {
-                        setState(() {
-                          _acceptedLabels[3] = labels;
-                        });
-                      }),
+                    label: 'Constant',
+                    expectedData: targets['Constant']!,
+                    showResults: _showResults,
+                    acceptedLabels: _acceptedLabels[3],
+                    onAcceptedLabelsChanged: (labels) {
+                      setState(() {
+                        _acceptedLabels[3] = labels;
+                      });
+                    },
+                    onCorrectAnswer: _checkAnswers, // Pass the callback
+                  ),
                 ],
               ),
               const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: _checkAnswers,
-                    child: const Text('Check Answers'),
-                  ),
-                  ElevatedButton(
-                    onPressed: _nextQuestion,
-                    child: const Text('Next Question'),
-                  ),
-                ],
+              ElevatedButton(
+                onPressed: _checkAnswers,
+                child: const Text('Check Answers'),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _nextQuestion,
+                child: const Text('Next Question'),
               ),
             ],
           ),
+          ConfettiWidget(
+            confettiController: _confettiController,
+            blastDirectionality: BlastDirectionality.explosive,
+            shouldLoop: false,
+            colors: const [
+              Colors.green,
+              Colors.blue,
+              Colors.pink,
+              Colors.yellow
+            ],
+            child: Container(), // Placeholder widget
+          ),
         ],
+      ),
+    );
+  }
+}
+
+class ScoreDisplay extends StatelessWidget {
+  final int score;
+
+  const ScoreDisplay({Key? key, required this.score}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            spreadRadius: 2,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Text(
+        'Score: $score',
+        style: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
+        ),
       ),
     );
   }
