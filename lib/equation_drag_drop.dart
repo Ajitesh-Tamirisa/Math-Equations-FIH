@@ -637,7 +637,7 @@ class _EquationDragDropState extends State<EquationDragDrop> {
   bool _gameCompleted = false; // Flag to check if the game is complete
   final ScoreManager _scoreManager = ScoreManager();
   final ConfettiController _confettiController =
-      ConfettiController(duration: const Duration(seconds: 1));
+      ConfettiController(duration: const Duration(seconds: 2));
   final ConfettiController _endGameConfettiController =
       ConfettiController(duration: const Duration(seconds: 3));
   bool _scoreUpdated = false; // Flag to ensure score increments only once
@@ -778,7 +778,7 @@ class _EquationDragDropState extends State<EquationDragDrop> {
 
     if (allCorrect) {
       _scoreManager.incrementScore(
-          1); // Increment the score by 1 if all answers are correct
+          10); // Increment the score by 10 if all answers are correct
       _scoreUpdated = true; // Set flag to true to prevent further score updates
       _confettiController.play(); // Play confetti animation
 
@@ -858,8 +858,8 @@ class _EquationDragDropState extends State<EquationDragDrop> {
                   Colors.pink,
                   Colors.yellow
                 ],
-                numberOfParticles: 200,
-                emissionFrequency: 0.05,
+                numberOfParticles: 10,
+                emissionFrequency: 0.1,
                 gravity: 0.1,
                 child: Container(), // Placeholder widget
               ),
