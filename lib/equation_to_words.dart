@@ -24,6 +24,255 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
       'words': ['y', 'three', 'minus', 'equals', 'five', 'ten'],
       'answer': ['three', 'y', 'minus', 'five', 'equals', 'ten']
     },
+    {
+      'equation': '4a + 7 = 19',
+      'words': ['a', 'four', 'plus', 'equals', 'seven', 'nineteen'],
+      'answer': ['four', 'a', 'plus', 'seven', 'equals', 'nineteen']
+    },
+    {
+      'equation': '5b - 2 = 13',
+      'words': ['b', 'five', 'minus', 'equals', 'two', 'thirteen'],
+      'answer': ['five', 'b', 'minus', 'two', 'equals', 'thirteen']
+    },
+    {
+      'equation': '6c + 3 = 21',
+      'words': ['c', 'six', 'plus', 'equals', 'three', 'twenty-one'],
+      'answer': ['six', 'c', 'plus', 'three', 'equals', 'twenty-one']
+    },
+    {
+      'equation': '7d - 4 = 17',
+      'words': ['d', 'seven', 'minus', 'equals', 'four', 'seventeen'],
+      'answer': ['seven', 'd', 'minus', 'four', 'equals', 'seventeen']
+    },
+    {
+      'equation': '8e + 2 = 18',
+      'words': ['e', 'eight', 'plus', 'equals', 'two', 'eighteen'],
+      'answer': ['eight', 'e', 'plus', 'two', 'equals', 'eighteen']
+    },
+    {
+      'equation': '9f - 3 = 24',
+      'words': ['f', 'nine', 'minus', 'equals', 'three', 'twenty-four'],
+      'answer': ['nine', 'f', 'minus', 'three', 'equals', 'twenty-four']
+    },
+    {
+      'equation': '10g + 5 = 35',
+      'words': ['g', 'ten', 'plus', 'equals', 'five', 'thirty-five'],
+      'answer': ['ten', 'g', 'plus', 'five', 'equals', 'thirty-five']
+    },
+    {
+      'equation': '11h - 6 = 28',
+      'words': ['h', 'eleven', 'minus', 'equals', 'six', 'twenty-eight'],
+      'answer': ['eleven', 'h', 'minus', 'six', 'equals', 'twenty-eight']
+    },
+    {
+      'equation': '2x + 3y = 14',
+      'words': ['x', 'y', 'two', 'three', 'plus', 'equals', 'fourteen'],
+      'answer': ['two', 'x', 'plus', 'three', 'y', 'equals', 'fourteen']
+    },
+    {
+      'equation': '4a - 5b = 12',
+      'words': ['a', 'b', 'four', 'five', 'minus', 'equals', 'twelve'],
+      'answer': ['four', 'a', 'minus', 'five', 'b', 'equals', 'twelve']
+    },
+    {
+      'equation': '6c + 7d = 29',
+      'words': ['c', 'd', 'six', 'seven', 'plus', 'equals', 'twenty-nine'],
+      'answer': ['six', 'c', 'plus', 'seven', 'd', 'equals', 'twenty-nine']
+    },
+    {
+      'equation': '8e - 3f = 17',
+      'words': ['e', 'f', 'eight', 'three', 'minus', 'equals', 'seventeen'],
+      'answer': ['eight', 'e', 'minus', 'three', 'f', 'equals', 'seventeen']
+    },
+    {
+      'equation': '5x + 4y - 3z = 10',
+      'words': [
+        'x',
+        'y',
+        'z',
+        'five',
+        'four',
+        'three',
+        'plus',
+        'minus',
+        'equals',
+        'ten'
+      ],
+      'answer': [
+        'five',
+        'x',
+        'plus',
+        'four',
+        'y',
+        'minus',
+        'three',
+        'z',
+        'equals',
+        'ten'
+      ]
+    },
+    {
+      'equation': '7p + 2q - r = 15',
+      'words': [
+        'p',
+        'q',
+        'r',
+        'seven',
+        'two',
+        'one',
+        'plus',
+        'minus',
+        'equals',
+        'fifteen'
+      ],
+      'answer': [
+        'seven',
+        'p',
+        'plus',
+        'two',
+        'q',
+        'minus',
+        'one',
+        'r',
+        'equals',
+        'fifteen'
+      ]
+    },
+    {
+      'equation': '3m - 2n + 4o = 9',
+      'words': [
+        'm',
+        'n',
+        'o',
+        'three',
+        'two',
+        'four',
+        'plus',
+        'minus',
+        'equals',
+        'nine'
+      ],
+      'answer': [
+        'three',
+        'm',
+        'minus',
+        'two',
+        'n',
+        'plus',
+        'four',
+        'o',
+        'equals',
+        'nine'
+      ]
+    },
+    {
+      'equation': '9k + 3l - 6m = 18',
+      'words': [
+        'k',
+        'l',
+        'm',
+        'nine',
+        'three',
+        'six',
+        'plus',
+        'minus',
+        'equals',
+        'eighteen'
+      ],
+      'answer': [
+        'nine',
+        'k',
+        'plus',
+        'three',
+        'l',
+        'minus',
+        'six',
+        'm',
+        'equals',
+        'eighteen'
+      ]
+    },
+    {
+      'equation': '10u - 5v + 2w = 13',
+      'words': [
+        'u',
+        'v',
+        'w',
+        'ten',
+        'five',
+        'two',
+        'plus',
+        'minus',
+        'equals',
+        'thirteen'
+      ],
+      'answer': [
+        'ten',
+        'u',
+        'minus',
+        'five',
+        'v',
+        'plus',
+        'two',
+        'w',
+        'equals',
+        'thirteen'
+      ]
+    },
+    {
+      'equation': '4s + 6t - 3u = 20',
+      'words': [
+        's',
+        't',
+        'u',
+        'four',
+        'six',
+        'three',
+        'plus',
+        'minus',
+        'equals',
+        'twenty'
+      ],
+      'answer': [
+        'four',
+        's',
+        'plus',
+        'six',
+        't',
+        'minus',
+        'three',
+        'u',
+        'equals',
+        'twenty'
+      ]
+    },
+    {
+      'equation': '5v - 2w + 4x = 7',
+      'words': [
+        'v',
+        'w',
+        'x',
+        'five',
+        'two',
+        'four',
+        'plus',
+        'minus',
+        'equals',
+        'seven'
+      ],
+      'answer': [
+        'five',
+        'v',
+        'minus',
+        'two',
+        'w',
+        'plus',
+        'four',
+        'x',
+        'equals',
+        'seven'
+      ]
+    },
   ];
 
   int currentQuestionIndex = 0;
