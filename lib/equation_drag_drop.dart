@@ -617,6 +617,12 @@ class _DropTargetState extends State<DropTarget> {
 // import 'instructions_widget.dart';
 // import 'score_manager.dart';
 
+// import 'dart:async';
+// import 'package:confetti/confetti.dart';
+// import 'package:flutter/material.dart';
+// import 'instructions_widget.dart';
+// import 'score_manager.dart';
+
 // class EquationDragDrop extends StatefulWidget {
 //   const EquationDragDrop({Key? key}) : super(key: key);
 
@@ -627,13 +633,18 @@ class _DropTargetState extends State<DropTarget> {
 class _EquationDragDropState extends State<EquationDragDrop> {
   bool _showResults = false;
   int _currentQuestionIndex = 0;
+  int _questionsAnswered = 0; // Counter for the number of questions answered
+  bool _gameCompleted = false; // Flag to check if the game is complete
   final ScoreManager _scoreManager = ScoreManager();
   final ConfettiController _confettiController =
       ConfettiController(duration: const Duration(seconds: 1));
+  final ConfettiController _endGameConfettiController =
+      ConfettiController(duration: const Duration(seconds: 3));
   bool _scoreUpdated = false; // Flag to ensure score increments only once
 
   final List<Map<String, dynamic>> _questions = [
     // Your questions here
+
     {
       'equation': '2x + 3 = 5',
       'draggables': ['2', 'x', '+', '3', '=', '5'],
@@ -664,6 +675,76 @@ class _EquationDragDropState extends State<EquationDragDrop> {
         'Constant': ['6', '10']
       }
     },
+    {
+      'equation': '5b - 8 = 2',
+      'draggables': ['5', 'b', '-', '8', '=', '2'],
+      'targets': {
+        'Coefficient': ['5'],
+        'Variable': ['b'],
+        'Operator': ['-', '='],
+        'Constant': ['8', '2']
+      }
+    },
+    {
+      'equation': '6c + 9 = 15',
+      'draggables': ['6', 'c', '+', '9', '=', '15'],
+      'targets': {
+        'Coefficient': ['6'],
+        'Variable': ['c'],
+        'Operator': ['+', '='],
+        'Constant': ['9', '15']
+      }
+    },
+    {
+      'equation': '7d - 4 = 3',
+      'draggables': ['7', 'd', '-', '4', '=', '3'],
+      'targets': {
+        'Coefficient': ['7'],
+        'Variable': ['d'],
+        'Operator': ['-', '='],
+        'Constant': ['4', '3']
+      }
+    },
+    {
+      'equation': '8e + 12 = 20',
+      'draggables': ['8', 'e', '+', '12', '=', '20'],
+      'targets': {
+        'Coefficient': ['8'],
+        'Variable': ['e'],
+        'Operator': ['+', '='],
+        'Constant': ['12', '20']
+      }
+    },
+    {
+      'equation': '9f - 5 = 4',
+      'draggables': ['9', 'f', '-', '5', '=', '4'],
+      'targets': {
+        'Coefficient': ['9'],
+        'Variable': ['f'],
+        'Operator': ['-', '='],
+        'Constant': ['5', '4']
+      }
+    },
+    {
+      'equation': '10g + 14 = 24',
+      'draggables': ['10', 'g', '+', '14', '=', '24'],
+      'targets': {
+        'Coefficient': ['10'],
+        'Variable': ['g'],
+        'Operator': ['+', '='],
+        'Constant': ['14', '24']
+      }
+    },
+    {
+      'equation': '11h - 9 = 2',
+      'draggables': ['11', 'h', '-', '9', '=', '2'],
+      'targets': {
+        'Coefficient': ['11'],
+        'Variable': ['h'],
+        'Operator': ['-', '='],
+        'Constant': ['9', '2']
+      }
+    }
   ];
 
   late List<Map<String, dynamic>> _shuffledQuestions;
@@ -719,6 +800,13 @@ class _EquationDragDropState extends State<EquationDragDrop> {
           (_currentQuestionIndex + 1) % _shuffledQuestions.length;
       _resetDropTargets();
       _scoreUpdated = false; // Reset flag for the new question
+      _questionsAnswered++;
+
+      if (_questionsAnswered >= 2) {
+        _gameCompleted = true; // Set flag to true if 2 questions are answered
+        _endGameConfettiController
+            .play(); // Play end-of-game confetti animation
+      }
     });
   }
 
@@ -730,6 +818,97 @@ class _EquationDragDropState extends State<EquationDragDrop> {
 
   @override
   Widget build(BuildContext context) {
+    if (_gameCompleted) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Game Over'),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Congratulations! Your final score is ${_scoreManager.score}.',
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  // Restart the game or navigate to another screen
+                  setState(() {
+                    _questionsAnswered = 0;
+                    _currentQuestionIndex = 0;
+                    _gameCompleted = false;
+                    _scoreManager.resetScore();
+                    _shuffleQuestions();
+                    _resetDropTargets();
+                  });
+                },
+                child: const Text('Play Again'),
+              ),
+              const SizedBox(height: 20),
+              ConfettiWidget(
+                confettiController: _endGameConfettiController,
+                blastDirectionality: BlastDirectionality.explosive,
+                shouldLoop: false,
+                colors: const [
+                  Colors.green,
+                  Colors.blue,
+                  Colors.pink,
+                  Colors.yellow
+                ],
+                numberOfParticles: 200,
+                emissionFrequency: 0.05,
+                gravity: 0.1,
+                child: Container(), // Placeholder widget
+              ),
+              // Positioned.fill(
+              //   child: ConfettiWidget(
+              //     confettiController: _endGameConfettiController,
+              //     blastDirectionality: BlastDirectionality.explosive,
+              //     shouldLoop: false,
+              //     colors: const [
+              //       Colors.green,
+              //       Colors.blue,
+              //       Colors.pink,
+              //       Colors.yellow
+              //     ],
+              //     numberOfParticles: 100, // Increase the number of particles
+              //     emissionFrequency:
+              //         0.1, // Adjust emission frequency for more continuous effect
+              //     gravity:
+              //         0.1, // Adjust gravity to control how fast the confetti falls
+              //     blastDirection: -1 * 3.14 / 4, // Add different direction
+              //     child: Container(), // Placeholder widget
+              //   ),
+              // ),
+              // Positioned.fill(
+              //   child: ConfettiWidget(
+              //     confettiController: _endGameConfettiController,
+              //     blastDirectionality: BlastDirectionality.explosive,
+              //     shouldLoop: false,
+              //     colors: const [
+              //       Colors.green,
+              //       Colors.blue,
+              //       Colors.pink,
+              //       Colors.yellow
+              //     ],
+              //     numberOfParticles: 100, // Increase the number of particles
+              //     emissionFrequency:
+              //         0.1, // Adjust emission frequency for more continuous effect
+              //     gravity:
+              //         0.1, // Adjust gravity to control how fast the confetti falls
+              //     blastDirection: 1 * 3.14 / 4, // Add different direction
+              //     child: Container(), // Placeholder widget
+              //   ),
+              // )
+            ],
+          ),
+        ),
+      );
+    }
+
     var currentQuestion = _shuffledQuestions[_currentQuestionIndex];
     var equation = currentQuestion['equation'];
     var draggables = currentQuestion['draggables'] as List<String>;
