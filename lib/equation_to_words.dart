@@ -13,7 +13,7 @@ class EquationToWordsScreen extends StatefulWidget {
 
 class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
   final List<Map<String, dynamic>> questions = [
-    // Questions list (unchanged)
+    // Same question set (as above)
     {
       'equation': '2x + 4 = 8',
       'words': ['x', 'four', 'times', 'equals', 'two', 'eight', 'plus'],
@@ -272,7 +272,7 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
         'equals',
         'seven'
       ]
-    },
+    }
   ];
 
   int currentQuestionIndex = 0;
@@ -280,6 +280,9 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
   final ScoreManager _scoreManager = ScoreManager();
   final ConfettiController _confettiController =
       ConfettiController(duration: const Duration(seconds: 2));
+  int currentLevel = 1;
+  int questionsPerLevel = 2;
+  int totalQuestionsAnswered = 0;
 
   @override
   void initState() {
@@ -301,6 +304,12 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
       setState(() {
         _scoreManager.incrementScore(10); // Increment score by 10
         _confettiController.play(); // Play confetti on correct answer
+        totalQuestionsAnswered++;
+        if (totalQuestionsAnswered % questionsPerLevel == 0) {
+          _showLevelCompleteDialog(); // Show level complete dialog
+        } else {
+          _loadRandomQuestion(); // Load next question
+        }
       });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Correct!')),
@@ -310,6 +319,62 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
         const SnackBar(content: Text('Try again.')),
       );
     }
+  }
+
+  void _showLevelCompleteDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Level Complete!'),
+          content: Text(
+              'Congratulations! You\'ve completed Level $currentLevel.\nYour score is: ${_scoreManager.score}.'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Next Level'),
+              onPressed: () {
+                setState(() {
+                  currentLevel++;
+                  if (currentLevel * questionsPerLevel >= questions.length) {
+                    _showFinalScoreDialog();
+                  } else {
+                    _loadRandomQuestion();
+                  }
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showFinalScoreDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Game Complete!'),
+          content: Text(
+              'Well done! You have completed all levels.\nYour final score is: ${_scoreManager.score}.'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Restart Game'),
+              onPressed: () {
+                setState(() {
+                  currentLevel = 1;
+                  totalQuestionsAnswered = 0;
+                  _scoreManager.resetScore();
+                  _loadRandomQuestion();
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -326,7 +391,7 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Equation to Words Game'),
+        title: Text('Level $currentLevel'),
         actions: [
           InstructionsWidget(
             instructions: 'Welcome to Equations To Words!\n\n'
@@ -421,27 +486,6 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  void _showInstructions(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Instructions'),
-          content: const Text(
-              'Drag and drop the words to form the correct equation.'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Close'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 }
