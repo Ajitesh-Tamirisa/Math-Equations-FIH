@@ -1,4 +1,4 @@
-import 'dart:math';
+// import 'dart:math';
 import 'package:confetti/confetti.dart'; // Add confetti package
 import 'package:flutter/material.dart';
 import 'instructions_widget.dart';
@@ -12,8 +12,7 @@ class EquationToWordsScreen extends StatefulWidget {
 }
 
 class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
-  final List<Map<String, dynamic>> questions = [
-    // Same question set (as above)
+  final List<Map<String, dynamic>> easyQuestions = [
     {
       'equation': '2x + 4 = 8',
       'words': ['x', 'four', 'times', 'equals', 'two', 'eight', 'plus'],
@@ -39,6 +38,9 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
       'words': ['c', 'six', 'plus', 'equals', 'three', 'twenty-one'],
       'answer': ['six', 'c', 'plus', 'three', 'equals', 'twenty-one']
     },
+  ];
+
+  final List<Map<String, dynamic>> mediumQuestions = [
     {
       'equation': '7d - 4 = 17',
       'words': ['d', 'seven', 'minus', 'equals', 'four', 'seventeen'],
@@ -48,21 +50,6 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
       'equation': '8e + 2 = 18',
       'words': ['e', 'eight', 'plus', 'equals', 'two', 'eighteen'],
       'answer': ['eight', 'e', 'plus', 'two', 'equals', 'eighteen']
-    },
-    {
-      'equation': '9f - 3 = 24',
-      'words': ['f', 'nine', 'minus', 'equals', 'three', 'twenty-four'],
-      'answer': ['nine', 'f', 'minus', 'three', 'equals', 'twenty-four']
-    },
-    {
-      'equation': '10g + 5 = 35',
-      'words': ['g', 'ten', 'plus', 'equals', 'five', 'thirty-five'],
-      'answer': ['ten', 'g', 'plus', 'five', 'equals', 'thirty-five']
-    },
-    {
-      'equation': '11h - 6 = 28',
-      'words': ['h', 'eleven', 'minus', 'equals', 'six', 'twenty-eight'],
-      'answer': ['eleven', 'h', 'minus', 'six', 'equals', 'twenty-eight']
     },
     {
       'equation': '2x + 3y = 14',
@@ -79,11 +66,9 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
       'words': ['c', 'd', 'six', 'seven', 'plus', 'equals', 'twenty-nine'],
       'answer': ['six', 'c', 'plus', 'seven', 'd', 'equals', 'twenty-nine']
     },
-    {
-      'equation': '8e - 3f = 17',
-      'words': ['e', 'f', 'eight', 'three', 'minus', 'equals', 'seventeen'],
-      'answer': ['eight', 'e', 'minus', 'three', 'f', 'equals', 'seventeen']
-    },
+  ];
+
+  final List<Map<String, dynamic>> hardQuestions = [
     {
       'equation': '5x + 4y - 3z = 10',
       'words': [
@@ -219,60 +204,6 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
         'thirteen'
       ]
     },
-    {
-      'equation': '4s + 6t - 3u = 20',
-      'words': [
-        's',
-        't',
-        'u',
-        'four',
-        'six',
-        'three',
-        'plus',
-        'minus',
-        'equals',
-        'twenty'
-      ],
-      'answer': [
-        'four',
-        's',
-        'plus',
-        'six',
-        't',
-        'minus',
-        'three',
-        'u',
-        'equals',
-        'twenty'
-      ]
-    },
-    {
-      'equation': '5v - 2w + 4x = 7',
-      'words': [
-        'v',
-        'w',
-        'x',
-        'five',
-        'two',
-        'four',
-        'plus',
-        'minus',
-        'equals',
-        'seven'
-      ],
-      'answer': [
-        'five',
-        'v',
-        'minus',
-        'two',
-        'w',
-        'plus',
-        'four',
-        'x',
-        'equals',
-        'seven'
-      ]
-    }
   ];
 
   int currentQuestionIndex = 0;
@@ -281,31 +212,44 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
   final ConfettiController _confettiController =
       ConfettiController(duration: const Duration(seconds: 2));
   int currentLevel = 1;
-  int questionsPerLevel = 2;
   int totalQuestionsAnswered = 0;
+  List<Map<String, dynamic>> currentLevelQuestions = [];
 
   @override
   void initState() {
     super.initState();
+    _loadLevelQuestions();
     _loadRandomQuestion();
   }
 
+  void _loadLevelQuestions() {
+    // Load questions based on the current level
+    if (currentLevel == 1) {
+      currentLevelQuestions = List.from(easyQuestions)..shuffle();
+    } else if (currentLevel == 2) {
+      currentLevelQuestions = List.from(mediumQuestions)..shuffle();
+    } else if (currentLevel == 3) {
+      currentLevelQuestions = List.from(hardQuestions)..shuffle();
+    }
+  }
+
   void _loadRandomQuestion() {
-    final random = Random();
-    currentQuestionIndex = random.nextInt(10000) % questions.length;
+    currentQuestionIndex =
+        totalQuestionsAnswered % currentLevelQuestions.length;
     userAnswer = List<String>.filled(
-        questions[currentQuestionIndex]['answer'].length, '',
+        currentLevelQuestions[currentQuestionIndex]['answer'].length, '',
         growable: false);
   }
 
   void _checkAnswer() {
-    final answer = questions[currentQuestionIndex]['answer'] as List<String>;
+    final answer =
+        currentLevelQuestions[currentQuestionIndex]['answer'] as List<String>;
     if (userAnswer.join(' ') == answer.join(' ')) {
       setState(() {
         _scoreManager.incrementScore(10); // Increment score by 10
         _confettiController.play(); // Play confetti on correct answer
         totalQuestionsAnswered++;
-        if (totalQuestionsAnswered % questionsPerLevel == 0) {
+        if (totalQuestionsAnswered % currentLevelQuestions.length == 0) {
           _showLevelCompleteDialog(); // Show level complete dialog
         } else {
           _loadRandomQuestion(); // Load next question
@@ -335,13 +279,15 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
               onPressed: () {
                 setState(() {
                   currentLevel++;
-                  if (currentLevel * questionsPerLevel >= questions.length) {
-                    _showFinalScoreDialog();
+                  if (currentLevel > 3) {
+                    _showFinalScoreDialog(); // End the game after Level 3
                   } else {
-                    _loadRandomQuestion();
+                    totalQuestionsAnswered = 0;
+                    _loadLevelQuestions(); // Load questions for the new level
+                    _loadRandomQuestion(); // Load the first question of the new level
                   }
                 });
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // Close the dialog
               },
             ),
           ],
@@ -357,7 +303,7 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
         return AlertDialog(
           title: const Text('Game Complete!'),
           content: Text(
-              'Well done! You have completed all levels.\nYour final score is: ${_scoreManager.score}.'),
+              'You\'ve completed all levels! Your final score is: ${_scoreManager.score}.'),
           actions: <Widget>[
             TextButton(
               child: const Text('Restart Game'),
@@ -366,9 +312,10 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
                   currentLevel = 1;
                   totalQuestionsAnswered = 0;
                   _scoreManager.resetScore();
+                  _loadLevelQuestions();
                   _loadRandomQuestion();
                 });
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // Close the dialog
               },
             ),
           ],
@@ -378,14 +325,8 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
   }
 
   @override
-  void dispose() {
-    _confettiController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final currentQuestion = questions[currentQuestionIndex];
+    final currentQuestion = currentLevelQuestions[currentQuestionIndex];
     final equation = currentQuestion['equation'] as String;
     final words = currentQuestion['words'] as List<String>;
 
