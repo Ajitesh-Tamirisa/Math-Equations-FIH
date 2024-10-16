@@ -1,4 +1,3 @@
-// import 'dart:math';
 import 'package:confetti/confetti.dart'; // Add confetti package
 import 'package:flutter/material.dart';
 import 'instructions_widget.dart';
@@ -12,31 +11,57 @@ class EquationToWordsScreen extends StatefulWidget {
 }
 
 class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
+  List<DraggableItem> draggableItems = [];
   final List<Map<String, dynamic>> easyQuestions = [
     {
       'equation': '2x + 4 = 8',
       'words': ['x', 'four', 'times', 'equals', 'two', 'eight', 'plus'],
-      'answer': ['two', 'times', 'x', 'plus', 'four', 'equals', 'eight']
+      'translated': ['x', 'cuatro', 'veces', 'igual', 'dos', 'ocho', 'más'],
+      'answer': ['two', 'times', 'x', 'plus', 'four', 'equals', 'eight'],
+      'translatedAnswer': [
+        'dos',
+        'veces',
+        'x',
+        'más',
+        'cuatro',
+        'igual',
+        'ocho'
+      ],
     },
     {
       'equation': '3y - 5 = 10',
       'words': ['y', 'three', 'minus', 'equals', 'five', 'ten'],
-      'answer': ['three', 'y', 'minus', 'five', 'equals', 'ten']
+      'translated': ['y', 'tres', 'menos', 'igual', 'cinco', 'diez'],
+      'answer': ['three', 'y', 'minus', 'five', 'equals', 'ten'],
+      'translatedAnswer': ['tres', 'y', 'menos', 'cinco', 'igual', 'diez'],
     },
     {
       'equation': '4a + 7 = 19',
       'words': ['a', 'four', 'plus', 'equals', 'seven', 'nineteen'],
-      'answer': ['four', 'a', 'plus', 'seven', 'equals', 'nineteen']
+      'translated': ['a', 'cuatro', 'más', 'igual', 'siete', 'diecinueve'],
+      'answer': ['four', 'a', 'plus', 'seven', 'equals', 'nineteen'],
+      'translatedAnswer': [
+        'cuatro',
+        'a',
+        'más',
+        'siete',
+        'igual',
+        'diecinueve'
+      ],
     },
     {
       'equation': '5b - 2 = 13',
       'words': ['b', 'five', 'minus', 'equals', 'two', 'thirteen'],
-      'answer': ['five', 'b', 'minus', 'two', 'equals', 'thirteen']
+      'translated': ['b', 'cinco', 'menos', 'igual', 'dos', 'trece'],
+      'answer': ['five', 'b', 'minus', 'two', 'equals', 'thirteen'],
+      'translatedAnswer': ['cinco', 'b', 'menos', 'dos', 'igual', 'trece'],
     },
     {
       'equation': '6c + 3 = 21',
       'words': ['c', 'six', 'plus', 'equals', 'three', 'twenty-one'],
-      'answer': ['six', 'c', 'plus', 'three', 'equals', 'twenty-one']
+      'translated': ['c', 'seis', 'más', 'igual', 'tres', 'veintiuno'],
+      'answer': ['six', 'c', 'plus', 'three', 'equals', 'twenty-one'],
+      'translatedAnswer': ['seis', 'c', 'más', 'tres', 'igual', 'veintiuno'],
     },
   ];
 
@@ -44,27 +69,52 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
     {
       'equation': '7d - 4 = 17',
       'words': ['d', 'seven', 'minus', 'equals', 'four', 'seventeen'],
-      'answer': ['seven', 'd', 'minus', 'four', 'equals', 'seventeen']
+      'translated': ['d', 'siete', 'menos', 'igual', 'cuatro', 'diecisiete'],
+      'answer': ['seven', 'd', 'minus', 'four', 'equals', 'seventeen'],
+      'translatedAnswer': [
+        'siete',
+        'd',
+        'menos',
+        'cuatro',
+        'igual',
+        'diecisiete'
+      ],
     },
     {
       'equation': '8e + 2 = 18',
       'words': ['e', 'eight', 'plus', 'equals', 'two', 'eighteen'],
-      'answer': ['eight', 'e', 'plus', 'two', 'equals', 'eighteen']
+      'translated': ['e', 'ocho', 'más', 'igual', 'dos', 'dieciocho'],
+      'answer': ['eight', 'e', 'plus', 'two', 'equals', 'eighteen'],
+      'translatedAnswer': ['ocho', 'e', 'más', 'dos', 'igual', 'dieciocho'],
     },
     {
       'equation': '2x + 3y = 14',
       'words': ['x', 'y', 'two', 'three', 'plus', 'equals', 'fourteen'],
-      'answer': ['two', 'x', 'plus', 'three', 'y', 'equals', 'fourteen']
+      'translated': ['x', 'y', 'dos', 'tres', 'más', 'igual', 'catorce'],
+      'answer': ['two', 'x', 'plus', 'three', 'y', 'equals', 'fourteen'],
+      'translatedAnswer': ['dos', 'x', 'más', 'tres', 'y', 'igual', 'catorce'],
     },
     {
       'equation': '4a - 5b = 12',
       'words': ['a', 'b', 'four', 'five', 'minus', 'equals', 'twelve'],
-      'answer': ['four', 'a', 'minus', 'five', 'b', 'equals', 'twelve']
+      'translated': ['a', 'b', 'cuatro', 'cinco', 'menos', 'igual', 'doce'],
+      'answer': ['four', 'a', 'minus', 'five', 'equals', 'twelve'],
+      'translatedAnswer': ['cuatro', 'a', 'menos', 'cinco', 'igual', 'doce'],
     },
     {
       'equation': '6c + 7d = 29',
       'words': ['c', 'd', 'six', 'seven', 'plus', 'equals', 'twenty-nine'],
-      'answer': ['six', 'c', 'plus', 'seven', 'd', 'equals', 'twenty-nine']
+      'translated': ['c', 'd', 'seis', 'siete', 'más', 'igual', 'veintinueve'],
+      'answer': ['six', 'c', 'plus', 'seven', 'd', 'equals', 'twenty-nine'],
+      'translatedAnswer': [
+        'seis',
+        'c',
+        'más',
+        'siete',
+        'd',
+        'igual',
+        'veintinueve'
+      ],
     },
   ];
 
@@ -83,6 +133,18 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
         'equals',
         'ten'
       ],
+      'translated': [
+        'x',
+        'y',
+        'z',
+        'cinco',
+        'cuatro',
+        'tres',
+        'más',
+        'menos',
+        'igual',
+        'diez'
+      ],
       'answer': [
         'five',
         'x',
@@ -94,7 +156,19 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
         'z',
         'equals',
         'ten'
-      ]
+      ],
+      'translatedAnswer': [
+        'cinco',
+        'x',
+        'más',
+        'cuatro',
+        'y',
+        'menos',
+        'tres',
+        'z',
+        'igual',
+        'diez'
+      ],
     },
     {
       'equation': '7p + 2q - r = 15',
@@ -110,6 +184,18 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
         'equals',
         'fifteen'
       ],
+      'translated': [
+        'p',
+        'q',
+        'r',
+        'siete',
+        'dos',
+        'uno',
+        'más',
+        'menos',
+        'igual',
+        'quince'
+      ],
       'answer': [
         'seven',
         'p',
@@ -121,7 +207,19 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
         'r',
         'equals',
         'fifteen'
-      ]
+      ],
+      'translatedAnswer': [
+        'siete',
+        'p',
+        'más',
+        'dos',
+        'q',
+        'menos',
+        'uno',
+        'r',
+        'igual',
+        'quince'
+      ],
     },
     {
       'equation': '3m - 2n + 4o = 9',
@@ -137,6 +235,18 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
         'equals',
         'nine'
       ],
+      'translated': [
+        'm',
+        'n',
+        'o',
+        'tres',
+        'dos',
+        'cuatro',
+        'más',
+        'menos',
+        'igual',
+        'nueve'
+      ],
       'answer': [
         'three',
         'm',
@@ -148,7 +258,19 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
         'o',
         'equals',
         'nine'
-      ]
+      ],
+      'translatedAnswer': [
+        'tres',
+        'm',
+        'menos',
+        'dos',
+        'n',
+        'más',
+        'cuatro',
+        'o',
+        'igual',
+        'nueve'
+      ],
     },
     {
       'equation': '9k + 3l - 6m = 18',
@@ -164,6 +286,18 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
         'equals',
         'eighteen'
       ],
+      'translated': [
+        'k',
+        'l',
+        'm',
+        'nueve',
+        'tres',
+        'seis',
+        'más',
+        'menos',
+        'igual',
+        'dieciocho'
+      ],
       'answer': [
         'nine',
         'k',
@@ -175,39 +309,76 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
         'm',
         'equals',
         'eighteen'
-      ]
+      ],
+      'translatedAnswer': [
+        'nueve',
+        'k',
+        'más',
+        'tres',
+        'l',
+        'menos',
+        'seis',
+        'm',
+        'igual',
+        'dieciocho'
+      ],
     },
     {
-      'equation': '10u - 5v + 2w = 13',
+      'equation': '4a + 5b - 2c = 20',
       'words': [
-        'u',
-        'v',
-        'w',
-        'ten',
+        'a',
+        'b',
+        'c',
+        'four',
         'five',
         'two',
         'plus',
         'minus',
         'equals',
-        'thirteen'
+        'twenty'
+      ],
+      'translated': [
+        'a',
+        'b',
+        'c',
+        'cuatro',
+        'cinco',
+        'dos',
+        'más',
+        'menos',
+        'igual',
+        'veinte'
       ],
       'answer': [
-        'ten',
-        'u',
-        'minus',
-        'five',
-        'v',
+        'four',
+        'a',
         'plus',
+        'five',
+        'b',
+        'minus',
         'two',
-        'w',
+        'c',
         'equals',
-        'thirteen'
-      ]
+        'twenty'
+      ],
+      'translatedAnswer': [
+        'cuatro',
+        'a',
+        'más',
+        'cinco',
+        'b',
+        'menos',
+        'dos',
+        'c',
+        'igual',
+        'veinte'
+      ],
     },
   ];
 
+  bool isSpanish = false; // Track the current language
   int currentQuestionIndex = 0;
-  List<String> userAnswer = [];
+  List<Map<String, String>> userAnswer = [];
   final ScoreManager _scoreManager = ScoreManager();
   final ConfettiController _confettiController =
       ConfettiController(duration: const Duration(seconds: 2));
@@ -223,7 +394,6 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
   }
 
   void _loadLevelQuestions() {
-    // Load questions based on the current level
     if (currentLevel == 1) {
       currentLevelQuestions = List.from(easyQuestions)..shuffle();
     } else if (currentLevel == 2) {
@@ -236,15 +406,31 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
   void _loadRandomQuestion() {
     currentQuestionIndex =
         totalQuestionsAnswered % currentLevelQuestions.length;
-    userAnswer = List<String>.filled(
-        currentLevelQuestions[currentQuestionIndex]['answer'].length, '',
-        growable: false);
+    userAnswer = List<Map<String, String>>.filled(
+      currentLevelQuestions[currentQuestionIndex]['answer'].length,
+      {'english': '', 'spanish': ''},
+      growable: false,
+    );
   }
 
   void _checkAnswer() {
-    final answer =
-        currentLevelQuestions[currentQuestionIndex]['answer'] as List<String>;
-    if (userAnswer.join(' ') == answer.join(' ')) {
+    final answer = currentLevelQuestions[currentQuestionIndex]
+        [isSpanish ? 'translatedAnswer' : 'answer'] as List<String>;
+
+    // Join all the 'english' values from userAnswer
+    final userJoinedEnglishAnswer = userAnswer
+        .map((map) => map['english'] ?? '') // Extract 'english' values
+        .join(' '); // Join them into a single string
+    // Join all the 'english' values from userAnswer
+
+    final userJoinedSpanishAnswer = userAnswer
+        .map((map) => map['spanish'] ?? '') // Extract 'english' values
+        .join(' '); // Join them into a single string
+
+    final result =
+        isSpanish ? userJoinedSpanishAnswer : userJoinedEnglishAnswer;
+
+    if (result == answer.join(' ')) {
       setState(() {
         _scoreManager.incrementScore(10); // Increment score by 10
         _confettiController.play(); // Play confetti on correct answer
@@ -255,13 +441,11 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
           _loadRandomQuestion(); // Load next question
         }
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Correct!')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Correct!')));
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Try again.')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Try again.')));
     }
   }
 
@@ -328,16 +512,46 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
   Widget build(BuildContext context) {
     final currentQuestion = currentLevelQuestions[currentQuestionIndex];
     final equation = currentQuestion['equation'] as String;
-    final words = currentQuestion['words'] as List<String>;
+    final words = isSpanish
+        ? currentQuestion['translated']
+        : currentQuestion['words'] as List<String>;
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Level $currentLevel'),
         actions: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextButton.icon(
+                icon: Icon(
+                  IconData(0xe67b,
+                      fontFamily:
+                          'MaterialIcons'), // Custom icon for translation
+                  color: isSpanish
+                      ? Colors.blue
+                      : Colors.red, // Change icon color based on language
+                ),
+                label: Text(
+                  isSpanish ? 'Español' : 'English',
+                  style: TextStyle(
+                    color: isSpanish
+                        ? Colors.blue
+                        : Colors.red, // Change text color based on language
+                  ),
+                ),
+                onPressed: () {
+                  setState(() {
+                    isSpanish = !isSpanish; // Toggle language
+                  });
+                },
+              ),
+            ],
+          ),
           InstructionsWidget(
             instructions: 'Welcome to Equations To Words!\n\n'
                 'Learn and play with equations.\n\n'
-                'Drag and drop the given words into the correct order to match how an equation is read aloud. \n',
+                'Drag and drop the given words into the correct order to match how an equation is read aloud.\n',
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -368,10 +582,16 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
                   children: List.generate(userAnswer.length, (index) {
                     return DropTarget(
                       index: index,
-                      label: userAnswer[index],
+                      label: isSpanish
+                          ? userAnswer[index]['spanish'] ?? ''
+                          : userAnswer[index]['english'] ?? '',
                       onAccept: (receivedItem) {
                         setState(() {
-                          userAnswer[index] = receivedItem;
+                          int wordIndex = words.indexOf(receivedItem);
+                          userAnswer[index] = {
+                            'english': currentQuestion['words'][wordIndex],
+                            'spanish': currentQuestion['translated'][wordIndex],
+                          };
                         });
                       },
                     );
@@ -382,7 +602,7 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
                   alignment: WrapAlignment.spaceEvenly,
                   spacing: 20,
                   runSpacing: 20,
-                  children: words.map((word) {
+                  children: words.map<Widget>((word) {
                     return DraggableItem(
                       label: word,
                       data: word,
