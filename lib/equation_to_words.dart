@@ -1,4 +1,5 @@
 import 'package:confetti/confetti.dart'; // Add confetti package
+import 'package:equations/analytics_engine.dart';
 import 'package:flutter/material.dart';
 import 'instructions_widget.dart';
 import 'score_manager.dart';
@@ -544,6 +545,9 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
                   setState(() {
                     isSpanish = !isSpanish; // Toggle language
                   });
+                  print('Button clicked');
+                  AnalyticsEngine.logTranslateButtonClick(
+                      isSpanish ? 'Changed to Spanish' : 'Changed to English');
                 },
               ),
             ],

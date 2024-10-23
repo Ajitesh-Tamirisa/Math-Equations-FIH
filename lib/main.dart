@@ -307,8 +307,14 @@ import 'equation_to_words.dart';
 import 'what_are_equations_detail.dart';
 import 'importance_of_equations.dart';
 import 'real_world_applications.dart';
+import 'analytics_engine.dart';
+import 'package:firebase_core/firebase_core.dart';
+// import 'firebase_options.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  await AnalyticsEngine.init();
   runApp(const MyApp());
 }
 

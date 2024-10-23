@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "801818774864",
+    "project_id": "math-equations-demo",
+    "storage_bucket": "math-equations-demo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:801818774864:android:26d32c5a8ea5e3fce67055",
+        "android_client_info": {
+          "package_name": "com.example.equations"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAreEkdrMEHplPYTnDThr1vs3lN6engl2k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
