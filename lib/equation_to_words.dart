@@ -99,8 +99,16 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
       'equation': '4a - 5b = 12',
       'words': ['a', 'b', 'four', 'five', 'minus', 'equals', 'twelve'],
       'translated': ['a', 'b', 'cuatro', 'cinco', 'menos', 'igual', 'doce'],
-      'answer': ['four', 'a', 'minus', 'five', 'equals', 'twelve'],
-      'translatedAnswer': ['cuatro', 'a', 'menos', 'cinco', 'igual', 'doce'],
+      'answer': ['four', 'a', 'minus', 'five', 'b', 'equals', 'twelve'],
+      'translatedAnswer': [
+        'cuatro',
+        'a',
+        'menos',
+        'cinco',
+        'b',
+        'igual',
+        'doce'
+      ],
     },
     {
       'equation': '6c + 7d = 29',
@@ -519,7 +527,7 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Level $currentLevel'),
+        title: Text('Equations to words - Level $currentLevel'),
         actions: [
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -546,7 +554,7 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
                     isSpanish = !isSpanish; // Toggle language
                   });
                   print('Button clicked');
-                  AnalyticsEngine.logTranslateButtonClick(
+                  AnalyticsEngine.logTranslateButtonClickETW(
                       isSpanish ? 'Changed to Spanish' : 'Changed to English');
                 },
               ),

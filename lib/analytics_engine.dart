@@ -17,10 +17,20 @@ class AnalyticsEngine {
   //   _instance.logEvent(name: "translate_button_clicked_eq_to_words");
   // }
 
-  static void logTranslateButtonClick(String language) async {
+  static void logTranslateButtonClickETW(String language) async {
     print('language: $language');
     await instance.logEvent(
       name: 'eq_to_words_translate',
+      parameters: <String, Object>{
+        'language': language,
+      },
+    );
+  }
+
+  static void logTranslateButtonClickPOE(String language) async {
+    print('language: $language');
+    await instance.logEvent(
+      name: 'parts_of_eq__translate',
       parameters: <String, Object>{
         'language': language,
       },
