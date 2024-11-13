@@ -1,6 +1,7 @@
-import 'package:confetti/confetti.dart'; // Add confetti package
+import 'package:confetti/confetti.dart';
 import 'package:equations/analytics_engine.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'instructions_widget.dart';
 import 'score_manager.dart';
 
@@ -395,6 +396,16 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
   int totalQuestionsAnswered = 0;
   List<Map<String, dynamic>> currentLevelQuestions = [];
 
+  final FlutterTts _flutterTts = FlutterTts();
+  Future<void> _speak(String text) async {
+    // Initialize TTS
+    String language = isSpanish ? "es-ES" : "en-US";
+    await _flutterTts.setLanguage(language);
+    await _flutterTts.setPitch(1.0);
+    var result = await _flutterTts.speak(text);
+    print("TTS result: $result");
+  }
+
   @override
   void initState() {
     super.initState();
@@ -553,7 +564,6 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
                   setState(() {
                     isSpanish = !isSpanish; // Toggle language
                   });
-                  print('Button clicked');
                   AnalyticsEngine.logTranslateButtonClickETW(
                       isSpanish ? 'Changed to Spanish' : 'Changed to English');
                 },
@@ -610,16 +620,21 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
                   }),
                 ),
                 const SizedBox(height: 40),
-                Wrap(
-                  alignment: WrapAlignment.spaceEvenly,
-                  spacing: 20,
-                  runSpacing: 20,
-                  children: words.map<Widget>((word) {
-                    return DraggableItem(
-                      label: word,
-                      data: word,
-                    );
-                  }).toList(),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: words.map<Widget>((word) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10), // Adjust spacing here
+                        child: DraggableItem(
+                          label: word,
+                          data: word,
+                        ),
+                      );
+                    }).toList(),
+                  ),
                 ),
                 const SizedBox(height: 40),
                 ElevatedButton(
@@ -678,18 +693,58 @@ class DraggableItem extends StatelessWidget {
     return Draggable<String>(
       data: data,
       feedback: Material(
+        color: Colors.transparent, // No background for feedback chip
         child: Chip(
           label: Text(label,
               style: const TextStyle(color: Colors.white, fontSize: 18)),
-          backgroundColor: Colors.blue,
+          backgroundColor: Colors.blue, // Blue background while dragging
         ),
         elevation: 4.0,
       ),
-      childWhenDragging: Chip(
-        label: Text(label,
-            style: const TextStyle(color: Colors.grey, fontSize: 18)),
+      childWhenDragging: Opacity(
+        opacity: 0.5,
+        child: _buildDraggableContent(context),
       ),
-      child: Chip(label: Text(label, style: const TextStyle(fontSize: 18))),
+      child: _buildDraggableContent(context),
+    );
+  }
+
+  Widget _buildDraggableContent(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.blue),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(label, style: const TextStyle(fontSize: 18)),
+          SizedBox(width: 6),
+          GestureDetector(
+            onTap: () {
+              final parentState = context
+                  .findAncestorStateOfType<_EquationToWordsScreenState>();
+              parentState?._speak(label);
+              AnalyticsEngine.logAudioButtonClick(
+                  parentState?.isSpanish ?? false, 'Equations To Words');
+            },
+            child: Container(
+              padding: EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade100,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.volume_up,
+                size: 16, // Smaller size for a subtle look
+                color: Colors.blue,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

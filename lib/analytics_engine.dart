@@ -1,24 +1,16 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
-// import 'package:firebase_core/firebase_core.dart';
-// import 'package:flutter/material.dart';
-// import 'firebase_options.dart';
 
 class AnalyticsEngine {
   static final instance = FirebaseAnalytics.instance;
 
   static Future<void> init() async {
-    // WidgetsFlutterBinding.ensureInitialized();
-    // await Firebase.initializeApp(
-    //     options: DefaultFirebaseOptions.currentPlatform);
     await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
   }
 
-  // static void translateButtonClickedEqToWords() {
-  //   _instance.logEvent(name: "translate_button_clicked_eq_to_words");
-  // }
-
+  // log translate button clicks for Equation to Words
   static void logTranslateButtonClickETW(String language) async {
-    print('language: $language');
+    print(
+        'Equation to Words - Translate button clicked for language: $language');
     await instance.logEvent(
       name: 'eq_to_words_translate',
       parameters: <String, Object>{
@@ -27,12 +19,27 @@ class AnalyticsEngine {
     );
   }
 
+  // log translate button clicks for Parts of Equations
   static void logTranslateButtonClickPOE(String language) async {
-    print('language: $language');
+    print(
+        'Parts Of Equations - Translate button clicked for language: $language');
     await instance.logEvent(
       name: 'parts_of_eq__translate',
       parameters: <String, Object>{
         'language': language,
+      },
+    );
+  }
+
+  // log audio button clicks
+  static void logAudioButtonClick(bool isSpanish, String game) async {
+    print(
+        '$game - Audio button clicked for language: ${isSpanish ? 'Spanish' : 'English'}');
+    await instance.logEvent(
+      name: 'audio_button_click',
+      parameters: <String, Object>{
+        'language': isSpanish ? 'Spanish' : 'English',
+        'game': game,
       },
     );
   }
