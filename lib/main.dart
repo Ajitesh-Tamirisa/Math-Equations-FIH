@@ -309,11 +309,13 @@ import 'importance_of_equations.dart';
 import 'real_world_applications.dart';
 import 'analytics_engine.dart';
 import 'package:firebase_core/firebase_core.dart';
-// import 'firebase_options.dart';
+import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   await AnalyticsEngine.init();
   runApp(const MyApp());
 }

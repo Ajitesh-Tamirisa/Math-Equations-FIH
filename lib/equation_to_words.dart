@@ -14,6 +14,28 @@ class EquationToWordsScreen extends StatefulWidget {
 
 class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
   List<DraggableItem> draggableItems = [];
+
+  final Map<String, Map<String, String>> translations = {
+    'en': {
+      'check_answers': 'Check Answers',
+      'next_question': 'Next Question',
+      'game_over': 'Game Over',
+      'congratulations': 'Congratulations! Your final score is ',
+      'play_again': 'Play Again',
+      'instructions':
+          'Welcome to Parts of Equations!\n\nLearn and play with equations.\n\nDrag the part of the equation to the correct answer. Once you finish dragging all the parts into the correct boxes, click "Check Answers" button.\n',
+    },
+    'es': {
+      'check_answers': 'Verificar respuestas',
+      'next_question': 'Siguiente pregunta',
+      'game_over': 'Fin del juego',
+      'congratulations': '¡Felicidades! Tu puntaje final es ',
+      'play_again': 'Jugar de nuevo',
+      'instructions':
+          '¡Bienvenido a "Ecuaciones a Palabras"!\n\nAprende y juega con las ecuaciones.\n\nArrastra y suelta las palabras dadas en el orden correcto para que coincidan con cómo se lee una ecuación en voz alta.\n',
+    }
+  };
+
   final List<Map<String, dynamic>> easyQuestions = [
     {
       'equation': '2x + 4 = 8',
@@ -571,10 +593,9 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
             ],
           ),
           InstructionsWidget(
-            instructions: 'Welcome to Equations To Words!\n\n'
-                'Learn and play with equations.\n\n'
-                'Drag and drop the given words into the correct order to match how an equation is read aloud.\n',
-          ),
+              instructions: isSpanish
+                  ? translations['es']!['instructions']!
+                  : translations['en']!['instructions']!),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ScoreDisplay(score: _scoreManager.score),
@@ -639,7 +660,9 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
                 const SizedBox(height: 40),
                 ElevatedButton(
                   onPressed: _checkAnswer,
-                  child: const Text('Check Answer'),
+                  child: Text(isSpanish
+                      ? translations['es']!['check_answers']!
+                      : translations['en']!['check_answers']!),
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
@@ -648,7 +671,9 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
                       _loadRandomQuestion();
                     });
                   },
-                  child: const Text('Next Question'),
+                  child: Text(isSpanish
+                      ? translations['es']!['next_question']!
+                      : translations['en']!['next_question']!),
                 ),
                 const SizedBox(height: 20),
               ],
