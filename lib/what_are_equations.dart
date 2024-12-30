@@ -12,33 +12,70 @@ class WhatAreEquations extends StatelessWidget {
       appBar: AppBar(
         title: const Text('What are Equations?'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            ElevatedButton(
-              onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const WhatAreEquationsDetail())),
-              child: const Text('What Are Equations'),
+      body: Stack(
+        children: [
+          // Background image
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/Background.png',
+              fit: BoxFit.cover,
             ),
-            ElevatedButton(
-              onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const ImportanceOfEquations())),
-              child: const Text('Importance of Equations in Mathematics'),
+          ),
+          // Content
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              const WhatAreEquationsDetail())),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 32), // Set button padding
+                    textStyle:
+                        const TextStyle(fontSize: 24), // Set button text size
+                    elevation: 6, // Set button elevation (shadow)
+                  ),
+                  child: const Text('What Are Equations?'),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ImportanceOfEquations())),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 32), // Set button padding
+                    textStyle:
+                        const TextStyle(fontSize: 24), // Set button text size
+                    elevation: 6, // Set button elevation (shadow)
+                  ),
+                  child: const Text('Importance of Equations in Mathematics'),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const RealWorldApplications())),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 32), // Set button padding
+                    textStyle:
+                        const TextStyle(fontSize: 24), // Set button text size
+                    elevation: 6, // Set button elevation (shadow)
+                  ),
+                  child: const Text('Real-world Applications of Equations'),
+                ),
+              ],
             ),
-            ElevatedButton(
-              onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const RealWorldApplications())),
-              child: const Text('Real-world Applications of Equations'),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

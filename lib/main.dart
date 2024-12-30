@@ -338,7 +338,7 @@ class MyApp extends StatelessWidget {
         '/partsOfEquation': (context) => const EquationDragDrop(),
         '/equationToWords': (context) => const EquationToWordsScreen(),
         '/whatAreEquations': (context) => const WhatAreEquations(),
-        '/partsOfEquations': (context) => const PartsOfEquations(),
+        '/partsOfEquations': (context) => PartsOfEquations(),
         '/whatAreEquationsDetail': (context) => const WhatAreEquationsDetail(),
         '/importanceOfEquations': (context) => const ImportanceOfEquations(),
         '/realWorldApplications': (context) => const RealWorldApplications(),

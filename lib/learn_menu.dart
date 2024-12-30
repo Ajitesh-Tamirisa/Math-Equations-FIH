@@ -65,7 +65,7 @@ class LearnMenu extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => LinearEquationsContent()),
+                          builder: (context) => LinearEquationsIntroduction()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
