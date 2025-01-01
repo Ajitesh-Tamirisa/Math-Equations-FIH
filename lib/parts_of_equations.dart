@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'analytics_engine.dart';
 
 class PartsOfEquations extends StatefulWidget {
   @override
@@ -75,6 +76,8 @@ class _PartsOfEquationsState extends State<PartsOfEquations> {
               setState(() {
                 isSpanish = !isSpanish;
               });
+              AnalyticsEngine.logTranslateButtonClickLearn(
+                  isSpanish ? 'Changed to Spanish' : 'Changed to English');
             },
           ),
         ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'analytics_engine.dart';
 
 class ImportanceOfEquations extends StatefulWidget {
   const ImportanceOfEquations({Key? key}) : super(key: key);
@@ -72,6 +73,8 @@ class _ImportanceOfEquationsState extends State<ImportanceOfEquations> {
               setState(() {
                 isSpanish = !isSpanish;
               });
+              AnalyticsEngine.logTranslateButtonClickLearn(
+                  isSpanish ? 'Changed to Spanish' : 'Changed to English');
             },
           ),
         ],

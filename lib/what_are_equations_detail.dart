@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'analytics_engine.dart';
 
 class WhatAreEquationsDetail extends StatefulWidget {
   const WhatAreEquationsDetail({Key? key}) : super(key: key);
@@ -75,6 +76,8 @@ class _WhatAreEquationsDetailState extends State<WhatAreEquationsDetail> {
               setState(() {
                 isSpanish = !isSpanish;
               });
+              AnalyticsEngine.logTranslateButtonClickLearn(
+                  isSpanish ? 'Changed to Spanish' : 'Changed to English');
             },
           ),
         ],

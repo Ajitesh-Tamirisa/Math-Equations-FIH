@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'analytics_engine.dart';
 
 class RealWorldApplications extends StatefulWidget {
   const RealWorldApplications({Key? key}) : super(key: key);
@@ -77,6 +78,8 @@ class _RealWorldApplicationsState extends State<RealWorldApplications> {
               setState(() {
                 isSpanish = !isSpanish;
               });
+              AnalyticsEngine.logTranslateButtonClickLearn(
+                  isSpanish ? 'Changed to Spanish' : 'Changed to English');
             },
           ),
         ],
