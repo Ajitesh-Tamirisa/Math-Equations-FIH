@@ -31,6 +31,17 @@ class AnalyticsEngine {
     );
   }
 
+  // log translate button clicks for Learn Section
+  static void logTranslateButtonClickLearn(String language) async {
+    print('Learn Section - Translate button clicked for language: $language');
+    await instance.logEvent(
+      name: 'learn_section_translate',
+      parameters: <String, Object>{
+        'language': language,
+      },
+    );
+  }
+
   // log audio button clicks
   static void logAudioButtonClick(bool isSpanish, String game) async {
     print(

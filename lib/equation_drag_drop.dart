@@ -67,16 +67,27 @@ class DropTarget extends StatefulWidget {
 
 class _DropTargetState extends State<DropTarget> {
   bool hasIncorrectItem = false;
+  bool showFeedback = false;
+
+  void _resetState() {
+    setState(() {
+      hasIncorrectItem = false;
+      showFeedback = false;
+      widget.acceptedLabels.clear();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     Color targetColor = Colors.grey[300]!;
     if (widget.showResults) {
       if (widget.acceptedLabels.isEmpty) {
-        targetColor = Colors.grey[300]!;
-        hasIncorrectItem = false; // Reset the flag if no items are dropped
+        targetColor = Colors.red;
+        hasIncorrectItem = true; // Reset the flag if no items are dropped
+        showFeedback = true;
       } else if (widget.acceptedLabels
-          .any((label) => widget.expectedData.contains(label))) {
+              .every((label) => widget.expectedData.contains(label)) &&
+          widget.expectedData.length == widget.acceptedLabels.length) {
         targetColor = Colors.green;
         hasIncorrectItem = false; // Reset the flag if all items are correct
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -86,6 +97,7 @@ class _DropTargetState extends State<DropTarget> {
         targetColor = Colors.red;
         hasIncorrectItem =
             true; // Set the flag if any incorrect item is dropped
+        showFeedback = true; // Show feedback message
       }
     }
 
@@ -105,7 +117,7 @@ class _DropTargetState extends State<DropTarget> {
           builder: (context, candidateData, rejectedData) {
             return Container(
               width: 150,
-              height: 50,
+              height: 100,
               decoration: BoxDecoration(
                 color: hasIncorrectItem
                     ? Colors.red
@@ -114,12 +126,26 @@ class _DropTargetState extends State<DropTarget> {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Center(
-                child: Text(
-                  widget.label, // Display the drop target label
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      widget.label, // Display the drop target label
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    if (widget.acceptedLabels.isEmpty) ...[
+                      Text(
+                        'Drop ${widget.label}(s) here',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
             );
@@ -133,6 +159,12 @@ class _DropTargetState extends State<DropTarget> {
             style: const TextStyle(fontSize: 18, color: Colors.black),
           ),
         ),
+        if (showFeedback) ...[
+          Text(
+            'The answer is incorrect. Please try again.',
+            style: TextStyle(color: Colors.red),
+          )
+        ],
       ],
     );
   }
@@ -149,6 +181,8 @@ class _EquationDragDropState extends State<EquationDragDrop> {
   final ConfettiController _endGameConfettiController =
       ConfettiController(duration: const Duration(seconds: 3));
   bool _scoreUpdated = false; // Flag to ensure score increments only once
+  bool retryVisible =
+      false; // Flag to control the visibility of the retry button
 
   final List<Map<String, dynamic>> _questions = [
     // Your questions here
@@ -266,6 +300,7 @@ class _EquationDragDropState extends State<EquationDragDrop> {
       'game_over': 'Game Over',
       'congratulations': 'Congratulations! Your final score is ',
       'play_again': 'Play Again',
+      'retry': 'Retry',
       'instructions':
           'Welcome to Parts of Equations!\n\nLearn and play with equations.\n\nDrag the part of the equation to the correct answer. Once you finish dragging all the parts into the correct boxes, click "Check Answers" button.\n',
     },
@@ -279,6 +314,7 @@ class _EquationDragDropState extends State<EquationDragDrop> {
       'game_over': 'Fin del juego',
       'congratulations': '¡Felicidades! Tu puntaje final es ',
       'play_again': 'Jugar de nuevo',
+      'retry': 'Reintentar',
       'instructions':
           '¡Bienvenido a las Partes de Ecuaciones!\n\nAprende y juega con ecuaciones.\n\nArrastra la parte de la ecuación a la respuesta correcta. Una vez que termines de arrastrar todas las partes a las casillas correctas, haz clic en el botón "Verificar respuestas".\n',
     }
@@ -288,6 +324,13 @@ class _EquationDragDropState extends State<EquationDragDrop> {
 
   late List<Map<String, dynamic>> _shuffledQuestions;
   List<List<String>> _acceptedLabels = List.generate(4, (index) => []);
+  List<Color> _targetBackgroundColors =
+      List.generate(4, (index) => Colors.transparent);
+  List<String> _feedbackTexts = List.generate(4, (index) => '');
+
+  // Define a list of GlobalKeys for each DropTarget
+  List<GlobalKey<_DropTargetState>> _dropTargetKeys =
+      List.generate(4, (index) => GlobalKey<_DropTargetState>());
 
   @override
   void initState() {
@@ -302,20 +345,30 @@ class _EquationDragDropState extends State<EquationDragDrop> {
 
   void _checkAnswers() {
     if (_scoreUpdated) return; // Prevent score from updating more than once
-
     bool allCorrect = true;
     for (int i = 0; i < _acceptedLabels.length; i++) {
-      if (!_acceptedLabels[i].every((label) =>
-          _shuffledQuestions[_currentQuestionIndex]['targets']
-              .values
-              .elementAt(i)
-              .contains(label))) {
+      var targetLabels = _shuffledQuestions[_currentQuestionIndex]['targets']
+          .values
+          .elementAt(i);
+      var acceptedLabels = _acceptedLabels[i];
+
+      // Check if all target labels are in accepted labels and no extra labels are present
+      if (!(acceptedLabels.every(targetLabels.contains) &&
+          targetLabels.length == acceptedLabels.length)) {
         allCorrect = false;
-        break;
+        _targetBackgroundColors[i] =
+            Colors.red; // Set background color to red for incorrect targets
+        _feedbackTexts[i] =
+            'Incorrect'; // Set feedback text for incorrect targets
+      } else {
+        _targetBackgroundColors[i] =
+            Colors.green; // Set background color to green for correct targets
+        _feedbackTexts[i] = 'Correct'; // Set feedback text for correct targets
       }
     }
 
     if (allCorrect) {
+      _showCorrectAnswerFeedback(context);
       _scoreManager.incrementScore(
           10); // Increment the score by 10 if all answers are correct
       _scoreUpdated = true; // Set flag to true to prevent further score updates
@@ -325,6 +378,9 @@ class _EquationDragDropState extends State<EquationDragDrop> {
       Timer(const Duration(seconds: 2), () {
         _confettiController.stop();
       });
+    } else {
+      retryVisible =
+          true; // Show the retry button if the answer is wrong/partially wrong
     }
 
     setState(() {
@@ -332,9 +388,46 @@ class _EquationDragDropState extends State<EquationDragDrop> {
     });
   }
 
+  void _retry() {
+    setState(() {
+      for (int i = 0; i < _acceptedLabels.length; i++) {
+        // var targetLabels = _shuffledQuestions[_currentQuestionIndex]['targets']
+        //     .values
+        //     .elementAt(i);
+        // var acceptedLabels = _acceptedLabels[i];
+
+        // Clear the values in the wrongly answered drop targets
+        // if (!(acceptedLabels.every(targetLabels.contains) &&
+        //     targetLabels.length == acceptedLabels.length)) {
+        _acceptedLabels[i] = [];
+        // Reset the background color and feedback text for the wrongly answered targets
+        _targetBackgroundColors[i] = Colors.transparent; // or default color
+        _feedbackTexts[i] = ''; // Clear feedback text
+        // Reset the state of each drop target
+        // _dropTargetKeys[i].currentState?._resetState();
+        // }
+      }
+      for (int i = 0; i < _acceptedLabels.length; i++) {
+        _dropTargetKeys[i].currentState?._resetState();
+      }
+      _showResults = false; // Clear feedback and colors for all targets
+      retryVisible = false; // Hide the retry button
+    });
+  }
+
   void _nextQuestion() {
     setState(() {
-      _showResults = false;
+      for (int i = 0; i < _acceptedLabels.length; i++) {
+        // Clear the values in all drop targets
+        _acceptedLabels[i] = [];
+        // Reset the background color and feedback text for all targets
+        _targetBackgroundColors[i] = Colors.transparent; // or default color
+        _feedbackTexts[i] = ''; // Clear feedback text
+        // Reset the state of each drop target
+        _dropTargetKeys[i].currentState?._resetState();
+      }
+      _showResults = false; // Clear feedback and colors for all targets
+      retryVisible = false; // Hide the retry button
       _currentQuestionIndex =
           (_currentQuestionIndex + 1) % _shuffledQuestions.length;
       _resetDropTargets();
@@ -347,6 +440,15 @@ class _EquationDragDropState extends State<EquationDragDrop> {
             .play(); // Play end-of-game confetti animation
       }
     });
+  }
+
+  void _showCorrectAnswerFeedback(BuildContext context) {
+    final snackBar = SnackBar(
+      content: Text('Correct! Well done'),
+      // backgroundColor: Colors.green,
+      duration: Duration(seconds: 4),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   void _resetDropTargets() {
@@ -500,6 +602,7 @@ class _EquationDragDropState extends State<EquationDragDrop> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   DropTarget(
+                    key: _dropTargetKeys[0],
                     label: isSpanish
                         ? translations['es']!['coefficient']!
                         : translations['en']!['coefficient']!,
@@ -514,6 +617,7 @@ class _EquationDragDropState extends State<EquationDragDrop> {
                     onCorrectAnswer: _checkAnswers, // Pass the callback
                   ),
                   DropTarget(
+                    key: _dropTargetKeys[1],
                     label: isSpanish
                         ? translations['es']!['variable']!
                         : translations['en']!['variable']!,
@@ -528,6 +632,7 @@ class _EquationDragDropState extends State<EquationDragDrop> {
                     onCorrectAnswer: _checkAnswers, // Pass the callback
                   ),
                   DropTarget(
+                    key: _dropTargetKeys[2],
                     label: isSpanish
                         ? translations['es']!['operator']!
                         : translations['en']!['operator']!,
@@ -542,6 +647,7 @@ class _EquationDragDropState extends State<EquationDragDrop> {
                     onCorrectAnswer: _checkAnswers, // Pass the callback
                   ),
                   DropTarget(
+                    key: _dropTargetKeys[3],
                     label: isSpanish
                         ? translations['es']!['constant']!
                         : translations['en']!['constant']!,
@@ -557,19 +663,84 @@ class _EquationDragDropState extends State<EquationDragDrop> {
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _checkAnswers,
-                child: Text(isSpanish
-                    ? translations['es']!['check_answers']!
-                    : translations['en']!['check_answers']!),
-              ),
+              if (retryVisible) ...[
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _retry,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Colors.blue, // Set the background color to blue
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.refresh,
+                          color: Colors.white), // Add the refresh icon
+                      SizedBox(
+                          width:
+                              8), // Add some space between the icon and the text
+                      Text(
+                        isSpanish
+                            ? translations['es']!['retry']!
+                            : translations['en']!['retry']!,
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ],
+                  ),
+                ),
+              ] else ...[
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _checkAnswers,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Colors.green, // Set the background color to green
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.check,
+                          color: Colors
+                              .white), // Add the check icon with white color
+                      SizedBox(
+                          width:
+                              8), // Add some space between the icon and the text
+                      Text(
+                        isSpanish
+                            ? translations['es']!['check_answers']!
+                            : translations['en']!['check_answers']!,
+                        style: TextStyle(
+                            color: Colors.white), // Set the text color to white
+                      ),
+                    ],
+                  ),
+                )
+              ],
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _nextQuestion,
-                child: Text(isSpanish
-                    ? translations['es']!['next_question']!
-                    : translations['en']!['next_question']!),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      Colors.orange, // Set the background color to orange
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.arrow_forward,
+                        color: Colors
+                            .white), // Add the arrow forward icon with white color
+                    SizedBox(
+                        width:
+                            8), // Add some space between the icon and the text
+                    Text(
+                      isSpanish
+                          ? translations['es']!['next_question']!
+                          : translations['en']!['next_question']!,
+                      style: TextStyle(
+                          color: Colors.white), // Set the text color to white
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
