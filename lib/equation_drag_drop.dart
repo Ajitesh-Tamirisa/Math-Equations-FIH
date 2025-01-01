@@ -44,25 +44,27 @@ class DraggableItem extends StatelessWidget {
 }
 
 class DropTarget extends StatefulWidget {
-  final String label;
-  final List<String> expectedData;
-  final bool showResults;
   final List<String> acceptedLabels;
+  final bool showResults;
+  final List<String> expectedData;
   final ValueChanged<List<String>> onAcceptedLabelsChanged;
-  final VoidCallback onCorrectAnswer; // Add this callback
+  final VoidCallback onCorrectAnswer;
+  final String label;
+  final bool isSpanish;
 
   const DropTarget({
     Key? key,
-    required this.label,
-    required this.expectedData,
-    required this.showResults,
     required this.acceptedLabels,
+    required this.showResults,
+    required this.expectedData,
     required this.onAcceptedLabelsChanged,
-    required this.onCorrectAnswer, // Add this parameter
+    required this.onCorrectAnswer,
+    required this.label,
+    required this.isSpanish,
   }) : super(key: key);
 
   @override
-  State<DropTarget> createState() => _DropTargetState();
+  _DropTargetState createState() => _DropTargetState();
 }
 
 class _DropTargetState extends State<DropTarget> {
@@ -138,7 +140,9 @@ class _DropTargetState extends State<DropTarget> {
                     ),
                     if (widget.acceptedLabels.isEmpty) ...[
                       Text(
-                        'Drop ${widget.label}(s) here',
+                        widget.isSpanish
+                            ? 'Suelta ${widget.label}(s) aquí'
+                            : 'Drop ${widget.label}(s) here',
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey,
@@ -307,7 +311,7 @@ class _EquationDragDropState extends State<EquationDragDrop> {
     'es': {
       'coefficient': 'Coeficiente',
       'variable': 'Variable',
-      'operator': 'Operador',
+      'operator': 'Operadora',
       'constant': 'Constante',
       'check_answers': 'Verificar respuestas',
       'next_question': 'Siguiente pregunta',
@@ -615,6 +619,7 @@ class _EquationDragDropState extends State<EquationDragDrop> {
                       });
                     },
                     onCorrectAnswer: _checkAnswers, // Pass the callback
+                    isSpanish: isSpanish,
                   ),
                   DropTarget(
                     key: _dropTargetKeys[1],
@@ -630,6 +635,7 @@ class _EquationDragDropState extends State<EquationDragDrop> {
                       });
                     },
                     onCorrectAnswer: _checkAnswers, // Pass the callback
+                    isSpanish: isSpanish,
                   ),
                   DropTarget(
                     key: _dropTargetKeys[2],
@@ -645,6 +651,7 @@ class _EquationDragDropState extends State<EquationDragDrop> {
                       });
                     },
                     onCorrectAnswer: _checkAnswers, // Pass the callback
+                    isSpanish: isSpanish,
                   ),
                   DropTarget(
                     key: _dropTargetKeys[3],
@@ -660,6 +667,7 @@ class _EquationDragDropState extends State<EquationDragDrop> {
                       });
                     },
                     onCorrectAnswer: _checkAnswers, // Pass the callback
+                    isSpanish: isSpanish,
                   ),
                 ],
               ),
