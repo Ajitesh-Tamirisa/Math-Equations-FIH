@@ -22,6 +22,9 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
       'game_over': 'Game Over',
       'congratulations': 'Congratulations! Your final score is ',
       'play_again': 'Play Again',
+      'correct': 'Correct! Well done',
+      'incorrect': 'Incorrect. Try again.',
+      'drop_items': 'Drop items here',
       'instructions':
           'Welcome to Parts of Equations!\n\nLearn and play with equations.\n\nDrag the part of the equation to the correct answer. Once you finish dragging all the parts into the correct boxes, click "Check Answers" button.\n',
     },
@@ -31,6 +34,9 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
       'game_over': 'Fin del juego',
       'congratulations': '¡Felicidades! Tu puntaje final es ',
       'play_again': 'Jugar de nuevo',
+      'correct': '¡Correcto! Bien hecho',
+      'incorrect': 'Incorrecto. Inténtalo de nuevo.',
+      'drop_items': 'Suelta los elementos aquí',
       'instructions':
           '¡Bienvenido a "Ecuaciones a Palabras"!\n\nAprende y juega con las ecuaciones.\n\nArrastra y suelta las palabras dadas en el orden correcto para que coincidan con cómo se lee una ecuación en voz alta.\n',
     }
@@ -483,15 +489,33 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
           _loadRandomQuestion(); // Load next question
         }
       });
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Correct!')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(
+          isSpanish
+              ? translations['es']!['correct']!
+              : translations['en']!['correct']!,
+        ),
+        backgroundColor: Colors.green,
+      ));
     } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Try again.')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isSpanish
+                ? translations['es']!['incorrect']!
+                : translations['en']!['incorrect']!,
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
   void _showLevelCompleteDialog() {
+    if (currentLevel >= 3) {
+      _showFinalScoreDialog(); // End the game after Level 3
+      return;
+    }
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -626,8 +650,12 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
                     return DropTarget(
                       index: index,
                       label: isSpanish
-                          ? userAnswer[index]['spanish'] ?? ''
-                          : userAnswer[index]['english'] ?? '',
+                          ? (userAnswer[index]['spanish']?.isNotEmpty ?? false)
+                              ? userAnswer[index]['spanish']!
+                              : translations['es']!['drop_items']!
+                          : (userAnswer[index]['english']?.isNotEmpty ?? false)
+                              ? userAnswer[index]['english']!
+                              : translations['en']!['drop_items']!,
                       onAccept: (receivedItem) {
                         setState(() {
                           int wordIndex = words.indexOf(receivedItem);
@@ -660,9 +688,28 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
                 const SizedBox(height: 40),
                 ElevatedButton(
                   onPressed: _checkAnswer,
-                  child: Text(isSpanish
-                      ? translations['es']!['check_answers']!
-                      : translations['en']!['check_answers']!),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Colors.green, // Set the background color to green
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.check,
+                          color: Colors
+                              .white), // Add the check icon with white color
+                      SizedBox(
+                          width:
+                              8), // Add some space between the icon and the text
+                      Text(
+                        isSpanish
+                            ? translations['es']!['check_answers']!
+                            : translations['en']!['check_answers']!,
+                        style: TextStyle(
+                            color: Colors.white), // Set the text color to white
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
@@ -671,9 +718,28 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
                       _loadRandomQuestion();
                     });
                   },
-                  child: Text(isSpanish
-                      ? translations['es']!['next_question']!
-                      : translations['en']!['next_question']!),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Colors.orange, // Set the background color to orange
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.arrow_forward,
+                          color: Colors
+                              .white), // Add the arrow forward icon with white color
+                      SizedBox(
+                          width:
+                              8), // Add some space between the icon and the text
+                      Text(
+                        isSpanish
+                            ? translations['es']!['next_question']!
+                            : translations['en']!['next_question']!,
+                        style: TextStyle(
+                            color: Colors.white), // Set the text color to white
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 20),
               ],
@@ -792,9 +858,11 @@ class DropTarget extends StatelessWidget {
       onWillAccept: (data) => true,
       onAccept: onAccept,
       builder: (context, candidateData, rejectedData) {
+        bool isPlaceholder =
+            label == 'Drop items here' || label == 'Suelta los elementos aquí';
         return Container(
-          width: 70,
-          height: 50,
+          width: 125,
+          height: 65,
           margin: const EdgeInsets.symmetric(horizontal: 5.0),
           decoration: BoxDecoration(
             color: Colors.grey[300],
@@ -802,14 +870,16 @@ class DropTarget extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
           ),
           child: Center(
+              child: Center(
             child: Text(
-              label.isEmpty ? '' : label,
+              label,
               style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: label.isEmpty ? Colors.black : Colors.blue),
+                fontSize: isPlaceholder ? 16 : 20,
+                fontWeight: isPlaceholder ? FontWeight.normal : FontWeight.bold,
+                color: isPlaceholder ? Colors.grey : Colors.blue,
+              ),
             ),
-          ),
+          )),
         );
       },
     );
