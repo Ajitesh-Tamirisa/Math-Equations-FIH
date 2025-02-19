@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'instructions_widget.dart';
 import 'score_manager.dart';
+import 'language_switcher.dart';
+import 'package:provider/provider.dart';
+import 'language_provider.dart';
 
 class EquationToWordsScreen extends StatefulWidget {
   const EquationToWordsScreen({Key? key}) : super(key: key);
@@ -414,7 +417,7 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
     },
   ];
 
-  bool isSpanish = false; // Track the current language
+  bool _isQuestionAnsweredCorrectly = false;
   int currentQuestionIndex = 0;
   List<Map<String, String>> userAnswer = [];
   final ScoreManager _scoreManager = ScoreManager();
@@ -426,10 +429,11 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
 
   final FlutterTts _flutterTts = FlutterTts();
   Future<void> _speak(String text) async {
-    // Initialize TTS
+    final isSpanish =
+        Provider.of<LanguageProvider>(context, listen: false).isSpanish;
     String language = isSpanish ? "es-ES" : "en-US";
     await _flutterTts.setLanguage(language);
-    await _flutterTts.setPitch(1.0);
+    await _flutterTts.setPitch(3.0);
     var result = await _flutterTts.speak(text);
     print("TTS result: $result");
   }
@@ -462,6 +466,8 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
   }
 
   void _checkAnswer() {
+    final isSpanish =
+        Provider.of<LanguageProvider>(context, listen: false).isSpanish;
     final answer = currentLevelQuestions[currentQuestionIndex]
         [isSpanish ? 'translatedAnswer' : 'answer'] as List<String>;
 
@@ -483,11 +489,7 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
         _scoreManager.incrementScore(10); // Increment score by 10
         _confettiController.play(); // Play confetti on correct answer
         totalQuestionsAnswered++;
-        if (totalQuestionsAnswered % currentLevelQuestions.length == 0) {
-          _showLevelCompleteDialog(); // Show level complete dialog
-        } else {
-          _loadRandomQuestion(); // Load next question
-        }
+        _isQuestionAnsweredCorrectly = true;
       });
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(
@@ -509,6 +511,19 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
         ),
       );
     }
+  }
+
+  void _onNextQuestionButtonClicked() {
+    print('In Next button function');
+    if (totalQuestionsAnswered % currentLevelQuestions.length == 0) {
+      _showLevelCompleteDialog(); // Show level complete dialog
+    } else {
+      _loadRandomQuestion(); // Load the next random question
+    }
+    setState(() {
+      _isQuestionAnsweredCorrectly =
+          false; // Reset the flag for the next question
+    });
   }
 
   void _showLevelCompleteDialog() {
@@ -578,6 +593,7 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
   Widget build(BuildContext context) {
     final currentQuestion = currentLevelQuestions[currentQuestionIndex];
     final equation = currentQuestion['equation'] as String;
+    final isSpanish = Provider.of<LanguageProvider>(context).isSpanish;
     final words = isSpanish
         ? currentQuestion['translated']
         : currentQuestion['words'] as List<String>;
@@ -589,29 +605,14 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              TextButton.icon(
-                icon: Icon(
-                  IconData(0xe67b,
-                      fontFamily:
-                          'MaterialIcons'), // Custom icon for translation
-                  color: isSpanish
-                      ? Colors.blue
-                      : Colors.red, // Change icon color based on language
-                ),
-                label: Text(
-                  isSpanish ? 'Español' : 'English',
-                  style: TextStyle(
-                    color: isSpanish
-                        ? Colors.blue
-                        : Colors.red, // Change text color based on language
-                  ),
-                ),
-                onPressed: () {
-                  setState(() {
-                    isSpanish = !isSpanish; // Toggle language
-                  });
-                  AnalyticsEngine.logTranslateButtonClickETW(
-                      isSpanish ? 'Changed to Spanish' : 'Changed to English');
+              LanguageSwitcher(
+                isSpanish: isSpanish,
+                onLanguageChanged: (bool newIsSpanish) {
+                  Provider.of<LanguageProvider>(context, listen: false)
+                      .setLanguage(newIsSpanish);
+                  AnalyticsEngine.logTranslateButtonClickETW(newIsSpanish
+                      ? 'Changed to Spanish'
+                      : 'Changed to English');
                 },
               ),
             ],
@@ -713,11 +714,9 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      _loadRandomQuestion();
-                    });
-                  },
+                  onPressed: _isQuestionAnsweredCorrectly
+                      ? _onNextQuestionButtonClicked
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
                         Colors.orange, // Set the background color to orange
@@ -819,7 +818,9 @@ class DraggableItem extends StatelessWidget {
                   .findAncestorStateOfType<_EquationToWordsScreenState>();
               parentState?._speak(label);
               AnalyticsEngine.logAudioButtonClick(
-                  parentState?.isSpanish ?? false, 'Equations To Words');
+                  Provider.of<LanguageProvider>(context, listen: false)
+                      .isSpanish,
+                  'Equations To Words');
             },
             child: Container(
               padding: EdgeInsets.all(4),

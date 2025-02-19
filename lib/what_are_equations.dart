@@ -31,8 +31,7 @@ class WhatAreEquations extends StatelessWidget {
                   onPressed: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) =>
-                              const WhatAreEquationsDetail())),
+                          builder: (context) => WhatAreEquationsDetail())),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
                         vertical: 16, horizontal: 32), // Set button padding
@@ -47,7 +46,7 @@ class WhatAreEquations extends StatelessWidget {
                   onPressed: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const ImportanceOfEquations())),
+                          builder: (context) => ImportanceOfEquations())),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
                         vertical: 16, horizontal: 32), // Set button padding

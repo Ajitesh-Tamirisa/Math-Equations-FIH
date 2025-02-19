@@ -12,10 +12,8 @@ import 'real_world_applications.dart';
 import 'analytics_engine.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-
-// To do: Track analytics for language translations in learn section
-// To do: Fix bugs in Parts of Equations game
-// After level 3 'finish Game' button should be shown and not next level.
+import 'package:provider/provider.dart';
+import 'language_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +21,12 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await AnalyticsEngine.init();
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => LanguageProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -45,8 +48,8 @@ class MyApp extends StatelessWidget {
         '/equationToWords': (context) => const EquationToWordsScreen(),
         '/whatAreEquations': (context) => const WhatAreEquations(),
         '/partsOfEquations': (context) => PartsOfEquations(),
-        '/whatAreEquationsDetail': (context) => const WhatAreEquationsDetail(),
-        '/importanceOfEquations': (context) => const ImportanceOfEquations(),
+        '/whatAreEquationsDetail': (context) => WhatAreEquationsDetail(),
+        '/importanceOfEquations': (context) => ImportanceOfEquations(),
         '/realWorldApplications': (context) => const RealWorldApplications(),
       },
     );

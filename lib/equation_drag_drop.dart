@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'language_switcher.dart';
+import 'language_provider.dart';
 import 'instructions_widget.dart';
 import 'score_manager.dart';
 import 'analytics_engine.dart';
@@ -324,7 +327,7 @@ class _EquationDragDropState extends State<EquationDragDrop> {
     }
   };
 
-  bool isSpanish = false; // Track the current language
+  bool _isQuestionAnsweredCorrectly = false;
 
   late List<Map<String, dynamic>> _shuffledQuestions;
   List<List<String>> _acceptedLabels = List.generate(4, (index) => []);
@@ -430,6 +433,7 @@ class _EquationDragDropState extends State<EquationDragDrop> {
         // Reset the state of each drop target
         _dropTargetKeys[i].currentState?._resetState();
       }
+      _isQuestionAnsweredCorrectly = false;
       _showResults = false; // Clear feedback and colors for all targets
       retryVisible = false; // Hide the retry button
       _currentQuestionIndex =
@@ -453,6 +457,7 @@ class _EquationDragDropState extends State<EquationDragDrop> {
       duration: Duration(seconds: 4),
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    _isQuestionAnsweredCorrectly = true;
   }
 
   void _resetDropTargets() {
@@ -463,6 +468,8 @@ class _EquationDragDropState extends State<EquationDragDrop> {
 
   @override
   Widget build(BuildContext context) {
+    final isSpanish = Provider.of<LanguageProvider>(context).isSpanish;
+
     if (_gameCompleted) {
       return Scaffold(
         appBar: AppBar(
@@ -527,36 +534,14 @@ class _EquationDragDropState extends State<EquationDragDrop> {
       appBar: AppBar(
         title: const Text('Parts of Equations'),
         actions: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextButton.icon(
-                icon: Icon(
-                  IconData(0xe67b,
-                      fontFamily:
-                          'MaterialIcons'), // Custom icon for translation
-                  color: isSpanish
-                      ? Colors.blue
-                      : Colors.red, // Change icon color based on language
-                ),
-                label: Text(
-                  isSpanish ? 'Español' : 'English',
-                  style: TextStyle(
-                    color: isSpanish
-                        ? Colors.blue
-                        : Colors.red, // Change text color based on language
-                  ),
-                ),
-                onPressed: () {
-                  setState(() {
-                    isSpanish = !isSpanish; // Toggle language
-                  });
-                  print('Button clicked');
-                  AnalyticsEngine.logTranslateButtonClickPOE(
-                      isSpanish ? 'Changed to Spanish' : 'Changed to English');
-                },
-              ),
-            ],
+          LanguageSwitcher(
+            isSpanish: isSpanish,
+            onLanguageChanged: (bool newIsSpanish) {
+              Provider.of<LanguageProvider>(context, listen: false)
+                  .setLanguage(newIsSpanish);
+              AnalyticsEngine.logTranslateButtonClickETW(
+                  newIsSpanish ? 'Changed to Spanish' : 'Changed to English');
+            },
           ),
           InstructionsWidget(
               instructions: isSpanish
@@ -726,7 +711,7 @@ class _EquationDragDropState extends State<EquationDragDrop> {
               ],
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _nextQuestion,
+                onPressed: _isQuestionAnsweredCorrectly ? _nextQuestion : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor:
                       Colors.orange, // Set the background color to orange

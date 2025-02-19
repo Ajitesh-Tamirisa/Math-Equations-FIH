@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'analytics_engine.dart';
+import 'language_switcher.dart';
+import 'language_provider.dart';
 
 class PartsOfEquations extends StatefulWidget {
   @override
@@ -9,7 +12,6 @@ class PartsOfEquations extends StatefulWidget {
 class _PartsOfEquationsState extends State<PartsOfEquations> {
   bool showAnswer = false;
   String selectedAnswer = '';
-  bool isSpanish = false;
 
   final Map<String, String> englishText = {
     'title': 'Parts of Equations',
@@ -52,34 +54,22 @@ class _PartsOfEquationsState extends State<PartsOfEquations> {
 
   @override
   Widget build(BuildContext context) {
+    final isSpanish = Provider.of<LanguageProvider>(context).isSpanish;
     final text = isSpanish ? spanishText : englishText;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(text['title']!),
         actions: [
-          TextButton.icon(
-            icon: Icon(
-              IconData(0xe67b,
-                  fontFamily: 'MaterialIcons'), // Custom icon for translation
-              color: isSpanish
-                  ? Colors.blue
-                  : Colors.red, // Change icon color based on language
-            ),
-            label: Text(
-              isSpanish ? 'Español' : 'English',
-              style: TextStyle(
-                color: isSpanish ? Colors.blue : Colors.red,
-              ),
-            ),
-            onPressed: () {
-              setState(() {
-                isSpanish = !isSpanish;
-              });
+          LanguageSwitcher(
+            isSpanish: isSpanish,
+            onLanguageChanged: (bool newIsSpanish) {
+              Provider.of<LanguageProvider>(context, listen: false)
+                  .setLanguage(newIsSpanish);
               AnalyticsEngine.logTranslateButtonClickLearn(
-                  isSpanish ? 'Changed to Spanish' : 'Changed to English');
+                  newIsSpanish ? 'Changed to Spanish' : 'Changed to English');
             },
-          ),
+          )
         ],
       ),
       body: SingleChildScrollView(
