@@ -1,14 +1,24 @@
 import 'package:flutter/material.dart';
 import 'linear_equations_introduction.dart';
+import 'total_xp_display.dart';
+import 'total_xp_provider.dart';
+import 'package:provider/provider.dart';
 
 class LearnMenu extends StatelessWidget {
   const LearnMenu({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final totalXp = Provider.of<TotalXpProvider>(context).score;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Math Equations'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TotalXpDisplay(totalXp: totalXp),
+          )
+        ],
       ),
       body: Stack(
         children: [

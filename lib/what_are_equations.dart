@@ -2,15 +2,25 @@ import 'package:flutter/material.dart';
 import 'what_are_equations_detail.dart';
 import 'importance_of_equations.dart';
 import 'real_world_applications.dart';
+import 'package:provider/provider.dart';
+import 'total_xp_display.dart';
+import 'total_xp_provider.dart';
 
 class WhatAreEquations extends StatelessWidget {
   const WhatAreEquations({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final totalXp = Provider.of<TotalXpProvider>(context).score;
     return Scaffold(
       appBar: AppBar(
         title: const Text('What are Equations?'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TotalXpDisplay(totalXp: totalXp),
+          )
+        ],
       ),
       body: Stack(
         children: [

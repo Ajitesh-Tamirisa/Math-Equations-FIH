@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'total_xp_display.dart';
+import 'total_xp_provider.dart';
 
 class PlayMenu extends StatelessWidget {
   const PlayMenu({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final totalXp = Provider.of<TotalXpProvider>(context).score;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Play Games'),
@@ -14,6 +18,12 @@ class PlayMenu extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TotalXpDisplay(totalXp: totalXp),
+          )
+        ],
       ),
       body: Stack(
         children: [

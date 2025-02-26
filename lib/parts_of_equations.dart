@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'analytics_engine.dart';
 import 'language_switcher.dart';
 import 'language_provider.dart';
+import 'total_xp_display.dart';
+import 'total_xp_provider.dart';
 
 class PartsOfEquations extends StatefulWidget {
   @override
@@ -56,6 +58,7 @@ class _PartsOfEquationsState extends State<PartsOfEquations> {
   Widget build(BuildContext context) {
     final isSpanish = Provider.of<LanguageProvider>(context).isSpanish;
     final text = isSpanish ? spanishText : englishText;
+    final totalXp = Provider.of<TotalXpProvider>(context).score;
 
     return Scaffold(
       appBar: AppBar(
@@ -69,6 +72,10 @@ class _PartsOfEquationsState extends State<PartsOfEquations> {
               AnalyticsEngine.logTranslateButtonClickLearn(
                   newIsSpanish ? 'Changed to Spanish' : 'Changed to English');
             },
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TotalXpDisplay(totalXp: totalXp),
           )
         ],
       ),

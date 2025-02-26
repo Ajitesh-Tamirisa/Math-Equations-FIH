@@ -7,6 +7,8 @@ import 'language_provider.dart';
 import 'instructions_widget.dart';
 import 'score_manager.dart';
 import 'analytics_engine.dart';
+import 'total_xp_provider.dart';
+import 'total_xp_display.dart';
 
 class EquationDragDrop extends StatefulWidget {
   const EquationDragDrop({Key? key}) : super(key: key);
@@ -378,6 +380,8 @@ class _EquationDragDropState extends State<EquationDragDrop> {
       _showCorrectAnswerFeedback(context);
       _scoreManager.incrementScore(
           10); // Increment the score by 10 if all answers are correct
+      Provider.of<TotalXpProvider>(context, listen: false)
+          .incrementScore(10); // Update total XP
       _scoreUpdated = true; // Set flag to true to prevent further score updates
       _confettiController.play(); // Play confetti animation
 
@@ -469,6 +473,7 @@ class _EquationDragDropState extends State<EquationDragDrop> {
   @override
   Widget build(BuildContext context) {
     final isSpanish = Provider.of<LanguageProvider>(context).isSpanish;
+    final totalXp = Provider.of<TotalXpProvider>(context).score;
 
     if (_gameCompleted) {
       return Scaffold(
@@ -543,14 +548,18 @@ class _EquationDragDropState extends State<EquationDragDrop> {
                   newIsSpanish ? 'Changed to Spanish' : 'Changed to English');
             },
           ),
-          InstructionsWidget(
-              instructions: isSpanish
-                  ? translations['es']!['instructions']!
-                  : translations['en']!['instructions']!),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ScoreDisplay(score: _scoreManager.score),
           ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TotalXpDisplay(totalXp: totalXp),
+          ),
+          InstructionsWidget(
+              instructions: isSpanish
+                  ? translations['es']!['instructions']!
+                  : translations['en']!['instructions']!),
         ],
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -765,7 +774,7 @@ class ScoreDisplay extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.orangeAccent,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -776,13 +785,22 @@ class ScoreDisplay extends StatelessWidget {
           ),
         ],
       ),
-      child: Text(
-        'Score: $score',
-        style: const TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          color: Colors.black,
-        ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.rocket_launch,
+            color: Colors.black,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            'Current Score: $score',
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+        ],
       ),
     );
   }

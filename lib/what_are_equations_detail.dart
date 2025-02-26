@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'analytics_engine.dart';
 import 'language_switcher.dart';
 import 'language_provider.dart';
+import 'total_xp_display.dart';
+import 'total_xp_provider.dart';
 
 class WhatAreEquationsDetail extends StatefulWidget {
   const WhatAreEquationsDetail({Key? key}) : super(key: key);
@@ -56,6 +58,7 @@ class _WhatAreEquationsDetailState extends State<WhatAreEquationsDetail> {
   Widget build(BuildContext context) {
     final isSpanish = Provider.of<LanguageProvider>(context).isSpanish;
     final text = isSpanish ? spanishText : englishText;
+    final totalXp = Provider.of<TotalXpProvider>(context).score;
 
     return Scaffold(
       appBar: AppBar(
@@ -69,6 +72,10 @@ class _WhatAreEquationsDetailState extends State<WhatAreEquationsDetail> {
               AnalyticsEngine.logTranslateButtonClickLearn(
                   newIsSpanish ? 'Changed to Spanish' : 'Changed to English');
             },
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TotalXpDisplay(totalXp: totalXp),
           )
         ],
       ),

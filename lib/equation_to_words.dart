@@ -7,6 +7,8 @@ import 'score_manager.dart';
 import 'language_switcher.dart';
 import 'package:provider/provider.dart';
 import 'language_provider.dart';
+import 'total_xp_display.dart';
+import 'total_xp_provider.dart';
 
 class EquationToWordsScreen extends StatefulWidget {
   const EquationToWordsScreen({Key? key}) : super(key: key);
@@ -487,6 +489,7 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
     if (result == answer.join(' ')) {
       setState(() {
         _scoreManager.incrementScore(10); // Increment score by 10
+        Provider.of<TotalXpProvider>(context, listen: false).incrementScore(10);
         _confettiController.play(); // Play confetti on correct answer
         totalQuestionsAnswered++;
         _isQuestionAnsweredCorrectly = true;
@@ -594,6 +597,7 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
     final currentQuestion = currentLevelQuestions[currentQuestionIndex];
     final equation = currentQuestion['equation'] as String;
     final isSpanish = Provider.of<LanguageProvider>(context).isSpanish;
+    final totalXp = Provider.of<TotalXpProvider>(context).score;
     final words = isSpanish
         ? currentQuestion['translated']
         : currentQuestion['words'] as List<String>;
@@ -617,14 +621,18 @@ class _EquationToWordsScreenState extends State<EquationToWordsScreen> {
               ),
             ],
           ),
-          InstructionsWidget(
-              instructions: isSpanish
-                  ? translations['es']!['instructions']!
-                  : translations['en']!['instructions']!),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ScoreDisplay(score: _scoreManager.score),
           ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TotalXpDisplay(totalXp: totalXp),
+          ),
+          InstructionsWidget(
+              instructions: isSpanish
+                  ? translations['es']!['instructions']!
+                  : translations['en']!['instructions']!),
         ],
       ),
       body: Stack(
@@ -897,7 +905,7 @@ class ScoreDisplay extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.orangeAccent,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -908,13 +916,22 @@ class ScoreDisplay extends StatelessWidget {
           ),
         ],
       ),
-      child: Text(
-        'Score: $score',
-        style: const TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          color: Colors.black,
-        ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.rocket_launch,
+            color: Colors.black,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            'Current Score: $score',
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,11 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'total_xp_display.dart';
+import 'total_xp_provider.dart';
 
 class MainMenu extends StatelessWidget {
   const MainMenu({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final totalXp = Provider.of<TotalXpProvider>(context).score;
     return Scaffold(
+      appBar: AppBar(
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TotalXpDisplay(totalXp: totalXp),
+          )
+        ],
+      ),
       body: Stack(
         children: [
           Container(

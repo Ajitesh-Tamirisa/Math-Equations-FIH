@@ -3,11 +3,14 @@ import 'analytics_engine.dart';
 import 'package:provider/provider.dart';
 import 'language_switcher.dart';
 import 'language_provider.dart';
+import 'total_xp_display.dart';
+import 'total_xp_provider.dart';
 
 class ImportanceOfEquations extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isSpanish = Provider.of<LanguageProvider>(context).isSpanish;
+    final totalXp = Provider.of<TotalXpProvider>(context).score;
 
     final Map<String, String> englishText = {
       'title': 'Importance of Equations',
@@ -60,6 +63,10 @@ class ImportanceOfEquations extends StatelessWidget {
                   newIsSpanish ? 'Changed to Spanish' : 'Changed to English');
             },
           ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TotalXpDisplay(totalXp: totalXp),
+          )
         ],
       ),
       body: Center(
