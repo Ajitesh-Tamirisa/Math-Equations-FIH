@@ -20,11 +20,12 @@ class EquationDragDrop extends StatefulWidget {
 class DraggableItem extends StatelessWidget {
   final String label;
   final String data;
+  final Key key;
 
   const DraggableItem({
-    Key? key,
     required this.label,
     required this.data,
+    required this.key,
   }) : super(key: key);
 
   @override
@@ -53,6 +54,7 @@ class DropTarget extends StatefulWidget {
   final bool showResults;
   final List<String> expectedData;
   final ValueChanged<List<String>> onAcceptedLabelsChanged;
+  final ValueChanged<String> onItemRemoved;
   final VoidCallback onCorrectAnswer;
   final String label;
   final bool isSpanish;
@@ -63,6 +65,7 @@ class DropTarget extends StatefulWidget {
     required this.showResults,
     required this.expectedData,
     required this.onAcceptedLabelsChanged,
+    required this.onItemRemoved,
     required this.onCorrectAnswer,
     required this.label,
     required this.isSpanish,
@@ -112,7 +115,8 @@ class _DropTargetState extends State<DropTarget> {
       mainAxisSize: MainAxisSize.min,
       children: [
         DragTarget<String>(
-          onWillAccept: (data) => true,
+          onWillAccept: (data) => !widget
+              .showResults, // Disable drag-and-drop when results are shown
           onAccept: (receivedItem) {
             setState(() {
               widget.acceptedLabels
@@ -162,10 +166,40 @@ class _DropTargetState extends State<DropTarget> {
         ),
         Padding(
           padding: const EdgeInsets.only(top: 8.0),
-          child: Text(
-            widget.acceptedLabels
-                .join(', '), // Display all accepted labels separated by commas
-            style: const TextStyle(fontSize: 18, color: Colors.black),
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 8.0,
+            children: widget.acceptedLabels
+                .map((label) => Draggable<String>(
+                      data: label,
+                      child: Chip(
+                        label:
+                            Text(label, style: const TextStyle(fontSize: 18)),
+                      ),
+                      feedback: Material(
+                        child: Chip(
+                          label: Text(label,
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 18)),
+                          backgroundColor: Colors.blue,
+                        ),
+                        elevation: 4.0,
+                      ),
+                      childWhenDragging: Chip(
+                        label: Text(label,
+                            style: const TextStyle(
+                                color: Colors.grey, fontSize: 18)),
+                      ),
+                      onDragCompleted: () {
+                        setState(() {
+                          widget.acceptedLabels.remove(label);
+                          widget.onItemRemoved(label);
+                        });
+                      },
+                      ignoringFeedbackSemantics: widget
+                          .showResults, // Disable drag-and-drop when results are shown
+                    ))
+                .toList(),
           ),
         ),
         if (showFeedback) ...[
@@ -341,15 +375,24 @@ class _EquationDragDropState extends State<EquationDragDrop> {
   List<GlobalKey<_DropTargetState>> _dropTargetKeys =
       List.generate(4, (index) => GlobalKey<_DropTargetState>());
 
+  late List<String> _draggables;
+
   @override
   void initState() {
     super.initState();
     _shuffledQuestions = List.from(_questions);
     _shuffleQuestions();
+    _initializeDraggables();
   }
 
   void _shuffleQuestions() {
     _shuffledQuestions.shuffle();
+  }
+
+  void _initializeDraggables() {
+    var currentQuestion = _shuffledQuestions[_currentQuestionIndex];
+    var draggables = currentQuestion['draggables'] as List<String>;
+    _draggables = List.from(draggables);
   }
 
   void _checkAnswers() {
@@ -402,27 +445,18 @@ class _EquationDragDropState extends State<EquationDragDrop> {
   void _retry() {
     setState(() {
       for (int i = 0; i < _acceptedLabels.length; i++) {
-        // var targetLabels = _shuffledQuestions[_currentQuestionIndex]['targets']
-        //     .values
-        //     .elementAt(i);
-        // var acceptedLabels = _acceptedLabels[i];
-
-        // Clear the values in the wrongly answered drop targets
-        // if (!(acceptedLabels.every(targetLabels.contains) &&
-        //     targetLabels.length == acceptedLabels.length)) {
         _acceptedLabels[i] = [];
-        // Reset the background color and feedback text for the wrongly answered targets
         _targetBackgroundColors[i] = Colors.transparent; // or default color
         _feedbackTexts[i] = ''; // Clear feedback text
-        // Reset the state of each drop target
-        // _dropTargetKeys[i].currentState?._resetState();
-        // }
       }
       for (int i = 0; i < _acceptedLabels.length; i++) {
         _dropTargetKeys[i].currentState?._resetState();
       }
       _showResults = false; // Clear feedback and colors for all targets
       retryVisible = false; // Hide the retry button
+
+      // Reset the draggable items to their original state
+      _initializeDraggables();
     });
   }
 
@@ -451,6 +485,9 @@ class _EquationDragDropState extends State<EquationDragDrop> {
         _endGameConfettiController
             .play(); // Play end-of-game confetti animation
       }
+
+      // Initialize draggables for the next question
+      _initializeDraggables();
     });
   }
 
@@ -532,7 +569,6 @@ class _EquationDragDropState extends State<EquationDragDrop> {
 
     var currentQuestion = _shuffledQuestions[_currentQuestionIndex];
     var equation = currentQuestion['equation'];
-    var draggables = currentQuestion['draggables'] as List<String>;
     var targets = currentQuestion['targets'] as Map<String, List<String>>;
 
     return Scaffold(
@@ -591,8 +627,12 @@ class _EquationDragDropState extends State<EquationDragDrop> {
                 alignment: WrapAlignment.spaceEvenly,
                 spacing: 20,
                 runSpacing: 20,
-                children: draggables
-                    .map((label) => DraggableItem(label: label, data: label))
+                children: _draggables
+                    .map((label) => DraggableItem(
+                          key: Key(label),
+                          label: label,
+                          data: label,
+                        ))
                     .toList(),
               ),
               const SizedBox(height: 40),
@@ -610,6 +650,16 @@ class _EquationDragDropState extends State<EquationDragDrop> {
                     onAcceptedLabelsChanged: (labels) {
                       setState(() {
                         _acceptedLabels[0] = labels;
+                        _draggables
+                            .removeWhere((item) => labels.contains(item));
+                      });
+                    },
+                    onItemRemoved: (label) {
+                      setState(() {
+                        if (!_acceptedLabels
+                            .any((list) => list.contains(label))) {
+                          _draggables.add(label);
+                        }
                       });
                     },
                     onCorrectAnswer: _checkAnswers, // Pass the callback
@@ -626,6 +676,16 @@ class _EquationDragDropState extends State<EquationDragDrop> {
                     onAcceptedLabelsChanged: (labels) {
                       setState(() {
                         _acceptedLabels[1] = labels;
+                        _draggables
+                            .removeWhere((item) => labels.contains(item));
+                      });
+                    },
+                    onItemRemoved: (label) {
+                      setState(() {
+                        if (!_acceptedLabels
+                            .any((list) => list.contains(label))) {
+                          _draggables.add(label);
+                        }
                       });
                     },
                     onCorrectAnswer: _checkAnswers, // Pass the callback
@@ -642,6 +702,16 @@ class _EquationDragDropState extends State<EquationDragDrop> {
                     onAcceptedLabelsChanged: (labels) {
                       setState(() {
                         _acceptedLabels[2] = labels;
+                        _draggables
+                            .removeWhere((item) => labels.contains(item));
+                      });
+                    },
+                    onItemRemoved: (label) {
+                      setState(() {
+                        if (!_acceptedLabels
+                            .any((list) => list.contains(label))) {
+                          _draggables.add(label);
+                        }
                       });
                     },
                     onCorrectAnswer: _checkAnswers, // Pass the callback
@@ -658,6 +728,16 @@ class _EquationDragDropState extends State<EquationDragDrop> {
                     onAcceptedLabelsChanged: (labels) {
                       setState(() {
                         _acceptedLabels[3] = labels;
+                        _draggables
+                            .removeWhere((item) => labels.contains(item));
+                      });
+                    },
+                    onItemRemoved: (label) {
+                      setState(() {
+                        if (!_acceptedLabels
+                            .any((list) => list.contains(label))) {
+                          _draggables.add(label);
+                        }
                       });
                     },
                     onCorrectAnswer: _checkAnswers, // Pass the callback
